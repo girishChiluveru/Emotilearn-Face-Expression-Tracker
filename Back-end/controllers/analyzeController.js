@@ -3,7 +3,7 @@ async function analyzeFolderController(req, res) {
     try {
         
         const { folderPath } = req.body;
-        // console.log('folderPath:', folderPath);
+        console.log('folderPath:', folderPath);
         if (!folderPath) {
             return res.status(400).json({ error: "Folder name is required" });
         }

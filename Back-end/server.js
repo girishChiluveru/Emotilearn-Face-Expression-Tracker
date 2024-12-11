@@ -23,7 +23,7 @@ app.use(cookieParser());
 
 app.use('/photos', express.static(path.join(__dirname, 'photos')));
 // mongodb://127.0.0.1:27017/results
-connectToMongoDB("mongodb+srv://GirishChiluveru:admin@cluster0.ytwmf.mongodb.net/?retryWrites=true&w=majority")
+connectToMongoDB(process.env.CONNECTION_STRING)
     .then(() => console.log("MongoDB connected"))
     .catch((err) => console.error("MongoDB connection error:", err));
 

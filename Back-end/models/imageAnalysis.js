@@ -3,10 +3,10 @@
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
-
+require('dotenv').config(); 
 // Constants
 const API_URL = "https://api-inference.huggingface.co/models/trpakov/vit-face-expression";
-const API_TOKEN = "Bearer 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";
+const API_TOKEN = process.env.API_TOKEN;
 
 // Helper to read a file
 async function readFileAsync(filePath) {
