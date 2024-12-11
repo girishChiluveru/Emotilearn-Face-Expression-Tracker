@@ -1,0 +1,50 @@
+/* App.css */
+.App {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .reports-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+  }
+  
+  .reports-table th, .reports-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  .reports-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  
+  .analyze-btn, .view-btn {
+    padding: 5px 10px;
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+    border-radius: 3px;
+  }
+  
+  .analyze-btn {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .view-btn {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .analyze-btn:hover, .view-btn:hover {
+    opacity: 0.8;
+  }
+  

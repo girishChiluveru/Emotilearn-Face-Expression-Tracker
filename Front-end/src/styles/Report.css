@@ -1,0 +1,194 @@
+.container {
+    margin: 0 auto;
+    padding: 20px;
+    max-width: 1200px;
+    font-family: Arial, sans-serif;
+    overflow: auto;
+    /* Enables scrolling if content exceeds viewport */
+    height: 100vh;
+    /* Ensures container uses full height */
+    box-sizing: border-box;
+    /* Prevents padding from affecting dimensions */
+}
+
+
+/* Heading */
+
+.heading {
+    text-align: center;
+    color: #007bff;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+
+/* Table styling */
+
+.table-container {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow-y: auto;
+    /* Enable vertical scrolling */
+    max-height: 500px;
+    /* Set a fixed height for scrolling */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+}
+
+.table th,
+.table td {
+    padding-left: 50px;
+    padding-right: 50px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.table th {
+    padding: 20px;
+    background-color: #f4f4f4;
+    font-weight: bold;
+    color: #333;
+    position: sticky;
+    /* Makes the table header sticky */
+    top: 0;
+    /* Sticks the header to the top of the table container */
+    z-index: 2;
+    /* Keeps the header above other content */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Adds slight shadow for visibility */
+}
+
+.table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+
+/* Buttons */
+
+.btn {
+    padding: 5px 10px;
+    border: none;
+    height: 50px;
+    width: 150px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn.success {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn.warning {
+    background-color: #ffc107;
+    color: white;
+}
+
+.btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 2px solid #007bff;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* Modal styling */
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(11, 225, 54, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px #13f40333;
+    width: 300px;
+    max-width: 90%;
+}
+
+.modal-header,
+.modal-footer {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-footer {
+    border-top: none;
+    text-align: right;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    float: right;
+}
+
+.modal-body {
+    padding: 15px;
+    text-align: center;
+}
+
+div {
+    box-sizing: border-box;
+}
+
+.selection-bar {
+    background-color: #f0f0f0;
+    padding: 10px;
+    margin-bottom: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 2px solid #ddd;
+}
+
+.charts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    /* Space between charts */
+    margin-top: 20px;
+    /* Ensure separation from the selection bar */
+    padding: 10px;
+}
+
+.bar-chart {
+    width: 100%;
+    /* Make the chart responsive */
+    max-width: 600px;
+    margin: 0 auto;
+    /* Center align */
+}

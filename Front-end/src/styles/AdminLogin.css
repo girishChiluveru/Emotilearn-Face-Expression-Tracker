@@ -1,0 +1,147 @@
+/* General Reset */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+}
+
+
+/* Admin Login Styling */
+
+.admin-login-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.admin-login-form h1 {
+    font-size: 2.2rem;
+    color: #d32f2f;
+    margin-bottom: 25px;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.admin-login-form form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+
+/* Input Group Styling */
+
+.admin-login-form .input-group {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.admin-login-form label {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 8px;
+    display: block;
+}
+
+
+/* Input Field Styling */
+
+.admin-login-form input {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.admin-login-form input:focus {
+    border-color: #d32f2f;
+    box-shadow: 0 0 5px rgba(211, 47, 47, 0.5);
+}
+
+
+/* Button Styling */
+
+.admin-login-form button {
+    width: 100%;
+    background-color: #d32f2f;
+    color: white;
+    padding: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 10px;
+}
+
+.admin-login-form button:hover {
+    background-color: #b71c1c;
+}
+
+.admin-login-form button:active {
+    transform: scale(0.97);
+}
+
+
+/* Error Message Styling */
+
+.error-message {
+    color: #d32f2f;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    text-align: center;
+}
+
+
+/* Accessibility Improvements */
+
+.admin-login-form input:invalid {
+    border-color: #d32f2f;
+    box-shadow: 0 0 5px rgba(211, 47, 47, 0.3);
+}
+
+.admin-login-form input:invalid:focus {
+    border-color: #ff616f;
+}
+
+.admin-login-form button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+
+/* Media Query for Responsive Design */
+
+@media (max-width: 600px) {
+    .admin-login-form {
+        padding: 20px 15px;
+    }
+    .admin-login-form h1 {
+        font-size: 1.8rem;
+    }
+    .admin-login-form input,
+    .admin-login-form button {
+        font-size: 1rem;
+        padding: 10px;
+    }
+}

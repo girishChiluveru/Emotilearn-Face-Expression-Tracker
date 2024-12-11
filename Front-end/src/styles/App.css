@@ -1,0 +1,190 @@
+/* General App Styles */
+
+.app {
+    text-align: center;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow: hidden;
+    transition: background-color 0.4s ease, transform 0.4s ease;
+}
+
+
+/* Navbar Styles */
+
+
+/* Navbar Style */
+
+.navbar {
+    width: 100%;
+    background-color: #333;
+    /* Default dark color */
+    padding: 15px 30px;
+    /* Adjusted padding for better space */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Subtle shadow for better contrast */
+}
+
+
+/* Navbar Link Style */
+
+
+/* Navbar Style */
+
+.navbar {
+    width: 100%;
+    background-color: #2C3E50;
+    /* Deep blue-grey background */
+    padding: 15px 30px;
+    /* Adjusted padding for better space */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Subtle shadow for better contrast */
+}
+
+
+/* Navbar Link Style */
+
+.navbar a {
+    color: #ECF0F1;
+    /* Light grey color for text */
+    text-decoration: none;
+    margin: 0 20px;
+    /* Increased margin for more space between links */
+    font-weight: bold;
+    font-size: 1.1rem;
+    /* Slightly larger font for readability */
+    letter-spacing: 1px;
+    /* Adds a bit of spacing between letters for elegance */
+    text-transform: uppercase;
+    /* Makes the links all uppercase */
+    transition: color 0.3s ease, transform 0.3s ease, letter-spacing 0.3s ease;
+}
+
+
+/* Navbar Link Hover Effect */
+
+.navbar a:hover {
+    color: #F39C12;
+    /* Vibrant yellow color on hover */
+    transform: scale(1.1);
+    /* Slight zoom-in effect */
+    letter-spacing: 2px;
+    /* More spacing between letters on hover */
+}
+
+
+/* Navbar Active Link */
+
+.navbar a.active {
+    color: #E74C3C;
+    /* Red color for active state */
+    font-style: italic;
+    /* Makes the active link italicized for emphasis */
+}
+
+
+/* Sticky navbar effect */
+
+.navbar.scrolled {
+    background-color: #34495E;
+    /* Darker shade of blue-grey when scrolled */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+    /* Slightly stronger shadow */
+}
+
+
+/* Toggler icon for smaller screens */
+
+.navbar-toggler-icon {
+    background-color: #ECF0F1;
+    /* Light grey icon for better visibility */
+}
+
+
+/* Hover effect on the navbar toggler icon */
+
+.navbar-toggler-icon:hover {
+    background-color: #F39C12;
+    /* Yellow color on hover */
+    transform: rotate(90deg);
+    /* Rotate icon when hovered */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+
+/* Extra responsiveness for small screens */
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 10px 15px;
+        /* Adjust padding for smaller screens */
+    }
+    .navbar a {
+        font-size: 0.9rem;
+        /* Slightly smaller text size */
+        margin: 0 10px;
+        /* Reduced margin for small screens */
+    }
+}
+
+
+/* Landing Page Styles */
+
+
+/* Ensure the root container (body or app container) is using flex */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    /* Ensure content expands to fill screen */
+    overflow-y: auto;
+    /* Enable scroll if content overflows */
+}
+
+
+/* Main wrapper container to allow scrollable content */
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    /* Allow container to grow with content */
+}
+
+
+/* Optional: Apply max-width and center content */
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100%;
+}

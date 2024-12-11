@@ -1,0 +1,94 @@
+/* General page styles */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+    overflow-y: scroll;
+    /* Enables vertical scrolling */
+}
+
+h1,
+h2,
+h3 {
+    text-align: center;
+}
+
+.container {
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+
+/* Content scroll fix */
+
+#root {
+    height: 100vh;
+    overflow-y: auto;
+    /* Allows vertical scrolling inside the page */
+}
+
+
+/* Sticky emotion bar */
+
+.sticky-emotion-bar {
+    background-color: #f0f0f0;
+    padding: 10px;
+    margin-bottom: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+/* Button for clearing emotion selection */
+
+.clear-selection {
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.clear-selection:hover {
+    background-color: #0056b3;
+}
+
+
+/* Image previews */
+
+.image-preview {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+
+/* Emotion analysis cards */
+
+.emotion-analysis-card {
+    margin: 20px 0;
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    flex-wrap: wrap;
+}
+
+.bar-chart-container {
+    overflow-x: auto;
+    /* Allows horizontal scrolling for large charts */
+}

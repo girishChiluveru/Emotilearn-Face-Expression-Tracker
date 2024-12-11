@@ -1,0 +1,295 @@
+/* Ensure the landing page has a scrollbar if the content overflows */
+
+.landing-page-container {
+    height: 100vh;
+    /* Ensure the container takes full height */
+    overflow-y: scroll;
+    /* Enable scroll */
+    padding: 20px;
+    box-sizing: border-box;
+    /* Make sure padding doesn't affect layout */
+}
+
+.hero-section {
+    padding: 80px 20px;
+    /* Adjust padding to make the hero section more prominent */
+    background-color: #4e79a7;
+    /* Adjust to your desired color */
+    color: white;
+    text-align: center;
+}
+
+.features-section,
+.about-section,
+.contact-section {
+    padding: 40px 20px;
+    text-align: center;
+    background-color: #fff;
+    margin-top: 30px;
+}
+
+h1,
+h2,
+p {
+    margin-bottom: 20px;
+}
+
+.hero-button {
+    background-color: #ff5733;
+    /* Adjust button color */
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease;
+}
+
+.hero-button:hover {
+    background-color: #c13f1f;
+    /* Button hover color */
+}
+
+
+/* Card-style Features */
+
+.feature-card {
+    background-color: #f4f4f4;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    flex: 1 1 calc(33% - 20px);
+    /* Adjust the width to 3 cards per row */
+}
+
+.feature-card h3 {
+    margin-bottom: 10px;
+}
+
+
+/* Contact Section */
+
+.contact-section p {
+    font-size: 1.2rem;
+    margin: 10px 0;
+}
+
+.contact-section a {
+    color: #4e79a7;
+    /* Link color */
+    text-decoration: none;
+}
+
+.contact-section a:hover {
+    text-decoration: underline;
+    /* Underline on hover */
+}
+
+
+/* Hero Section */
+
+.hero-section {
+    background-color: #4e79a7;
+    color: white;
+    text-align: center;
+    padding: 60px 20px;
+    flex-shrink: 0;
+    /* Prevents the hero section from shrinking */
+}
+
+.hero-title {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 30px;
+}
+
+.hero-button {
+    background-color: #ff6f61;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.25rem;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.hero-button:hover {
+    background-color: #e15b50;
+}
+
+
+/* About Section */
+
+.about-section {
+    background-color: #fff;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.about-section h2 {
+    font-size: 2rem;
+    color: #4e79a7;
+    margin-bottom: 20px;
+}
+
+.about-section p {
+    font-size: 1.125rem;
+    color: #666;
+    line-height: 1.8;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+
+/* Features Section */
+
+.features-section {
+    padding: 60px 20px;
+    background-color: #f3f3f3;
+    text-align: center;
+}
+
+.features-section h2 {
+    font-size: 2rem;
+    color: #4e79a7;
+    margin-bottom: 40px;
+}
+
+.feature-cards {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.feature-card {
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 300px;
+    margin: 10px;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+    text-align: center;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.feature-card p {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.6;
+}
+
+
+/* Contact Section */
+
+.contact-section {
+    padding: 60px 20px;
+    background-color: #fff;
+    text-align: center;
+}
+
+.contact-section h2 {
+    font-size: 2rem;
+    color: #4e79a7;
+    margin-bottom: 20px;
+}
+
+.contact-section form {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-section input,
+.contact-section textarea {
+    padding: 12px;
+    margin: 10px 0;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    width: 100%;
+}
+
+.contact-section button {
+    background-color: #4e79a7;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.125rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.contact-section button:hover {
+    background-color: #3b659a;
+}
+
+
+/* Flex Layout for Content */
+
+.landing-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    flex-grow: 1;
+    /* Ensure it grows with content */
+    min-height: 100vh;
+}
+
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    .hero-button {
+        font-size: 1.125rem;
+        padding: 12px 25px;
+    }
+    .feature-cards {
+        flex-direction: column;
+        align-items: center;
+    }
+    .feature-card {
+        width: 80%;
+        margin: 20px 0;
+    }
+    .about-section p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 1.5rem;
+    }
+    .hero-subtitle {
+        font-size: 0.875rem;
+    }
+    .feature-card {
+        width: 90%;
+    }
+}
