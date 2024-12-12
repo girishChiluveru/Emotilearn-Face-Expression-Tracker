@@ -53,16 +53,4 @@ const reportSchema = new mongoose.Schema({
 
 const reports = mongoose.model('report', reportSchema);
 
-
-const adminSchema = new mongoose.Schema({
-    name:{
-        type: String,
-        required: true
-    },
-    password:{
-        type: String,
-        required: true
-    }
-},{timestamps:true})
-const admin = mongoose.model('admin', adminSchema);
-module.exports = {reports,admin};
+module.exports = reports;
