@@ -12,31 +12,36 @@ const ChildLogin = ({ onStartQuiz }) => {
     password: '',
 });
 
-  const loginChild = async (e) => {
-    e.preventDefault();
-    console.log(data);
-    const { childname, password } = data;
-    if (childname.trim() !== '') {
-      
-      try {
-        const response = await axios.post('/login', { childname, password });
-        const { error, sessionId } = response.data;
+const loginChild = async (e) => {
+  e.preventDefault();
+  console.log(data);
+  const { childname, password } = data;
+  if (childname.trim() !== '') {
+    try {
+      const response = await axios.post('/login', { childname, password });
+      const { error, sessionId, isAdmin } = response.data;
 
-        if (error) {
-            toast.error(error);
-        }else {
-          setData({ childname: '', password: '' });
-          console.log('Session started successfully:', sessionId);
+      if (error) {
+        toast.error(error);
+      } else {
+        setData({ childname: '', password: '' });
+        console.log('Session started successfully:', sessionId);
+
+        if (isAdmin) {
+          console.log("He is admin");
+          navigate('/report'); // Redirect to reports page
+        } else {
           onStartQuiz(childname, sessionId);
-          navigate('/quiz');
-          
+          navigate('/quiz'); // Redirect to quiz page
+        }
       }
-      } catch (error) {
-        console.error(error);
-        toast.error('An error occurred while logging in.');
-      }
+    } catch (error) {
+      console.error(error);
+      toast.error('An error occurred while logging in.');
     }
-  };
+  }
+};
+
 
   return (
     <div className="start-screen">
