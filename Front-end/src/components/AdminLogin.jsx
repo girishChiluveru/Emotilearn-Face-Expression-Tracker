@@ -16,7 +16,7 @@ const AdminLogin = ({ onAdminLogin }) => {
     e.preventDefault();
     if (adminId === correctAdminId && adminPassword === correctAdminPassword) {
       onAdminLogin();
-      navigate("/report");
+      navigate("/Super-Admin");
     } else {
       setLoginError("Incorrect Admin ID or Password.");
     }
