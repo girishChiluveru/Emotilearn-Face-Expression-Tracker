@@ -15,7 +15,7 @@ import '../styles/App.css';
 import ChildRegister from './Register';
 import { Toaster } from 'react-hot-toast';
 import axios from 'axios';
-
+import SuperAdmin from './SuperAdmin';
 
 axios.defaults.baseURL = 'http://localhost:3000';
 axios.defaults.withCredentials = true;
@@ -130,6 +130,7 @@ function App() {
           <Route path="/memory-game" element={renderMemoryGame()} />
           <Route path="/report" element={<Report allSessions={allSessions} />} />
           <Route path="/child-register" element={<ChildRegister onStartQuiz={handleStartQuiz} />} />
+          <Route path="/super-admin" element={<SuperAdmin/>} />
         </Routes>
       </div>
     </Router>

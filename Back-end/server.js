@@ -48,6 +48,73 @@ app.use('/store-scores', storeScoresRoutes);
 app.use('/', require('./routes/authRoutes'));
 
 
+
+const Report = require('./models/report');
+
+app.use(express.json()); // Parse JSON payloads
+app.use(express.urlencoded({ extended: true })); 
+app.get('/children', async (req, res) => {
+    try {
+        const children = await Report.find();
+        res.json(children);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 2. Create a new child
+app.post('/children', async (req, res) => {
+    try {
+        const newChild = new Report(req.body);
+        await newChild.save();
+        res.status(201).json(newChild);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+// 3. Update child details
+app.put('/children/:id', async (req, res) => {
+    try {
+        const updatedChild = await Report.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(updatedChild);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+// 4. Delete a child
+app.delete('/children/:id', async (req, res) => {
+    try {
+        await Report.findByIdAndDelete(req.params.id);
+        res.json({ message: "Child deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 5. Update session's isProcessed
+app.patch('/sessions/:childId/:sessionId', async (req, res) => {
+    try {
+        const { childId, sessionId } = req.params;
+        const { isProcessed } = req.body;
+
+        const child = await Report.findById(childId);
+        const session = child.sessions.id(sessionId);
+        if (session) {
+            session.isProcessed = isProcessed;
+            await child.save();
+            res.json(child);
+        } else {
+            res.status(404).json({ message: "Session not found" });
+        }
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+// Start the server
+
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 
