@@ -64,22 +64,15 @@ def analyze_emotions():
 
             emotions = res['emotion']
 
-            # Normalize the emotion scores to sum up to 100%
-            total_score = sum(emotions.values())
-            if total_score > 0:
-                emotions_normalized = {emotion: (score / total_score) * 100 for emotion, score in emotions.items()}
-            else:
-                emotions_normalized = {emotion: 0 for emotion in emotions}  # No detectable emotions
-
             # Determine the dominant emotion
-            max_emotion = max(emotions_normalized, key=emotions_normalized.get)
+            max_emotion = max(emotions, key=emotions.get)
 
             # Append successful analysis to results
             results.append({
                 "file": image_file,
-                "emotions": {emotion: round(score, 2) for emotion, score in emotions_normalized.items()},
+                "emotions": emotions,
                 "dominant_emotion": max_emotion,
-                "dominant_score": round(emotions_normalized[max_emotion], 2)
+                "dominant_score": emotions[max_emotion]
             })
         except Exception as e:
             logging.exception(f"Error analyzing image: {image_path}")
