@@ -12,8 +12,8 @@ const processRoutes = require('./routes/process');
 const analyzeRoutes = require('./routes/analyze');
 const emotionRoutes = require('./routes/storeEmotions');
 const storeScoresRoutes = require('./routes/storeScores');
-const dotenv = require('dotenv').config()
-const cookieParser =require('cookie-parser')
+const dotenv = require('dotenv').config();
+const cookieParser =require('cookie-parser');
 
 
 const app = express();
