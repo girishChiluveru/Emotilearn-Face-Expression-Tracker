@@ -30,7 +30,7 @@ connectToMongoDB(process.env.CONNECTION_STRING)
 
 app.use(cors({
     credentials: true,
-    origin: 'http://localhost:5173' // Frontend origin
+    origin: ['http://localhost:5173','http://192.168.0.103:5173'] // Frontend origin
 }));
 
 
