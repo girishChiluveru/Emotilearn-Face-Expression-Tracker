@@ -13,8 +13,8 @@
 
 .hero-section {
     padding: 120px 20px;
-    background: linear-gradient(135deg, #4e79a7, #ff6f61);
-    color: white;
+    background: linear-gradient(135deg, #ffffff);
+    color: black;
     text-align: center;
     color: #ddd;
     background-size: cover;
@@ -28,7 +28,7 @@
     margin-bottom: 20px;
     font-size: 3rem;
     margin-bottom: 20px;
-    color: white;
+    color: black;
     /* Added this line to set text color to white */
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -43,7 +43,7 @@
 }
 
 .hero-button {
-    background-color: #ff6f61;
+    background-color: #2C3E50;
     border: none;
     padding: 18px 40px;
     font-size: 1.5rem;
@@ -55,7 +55,7 @@
 
 .hero-button:hover {
     background-color: #e15b50;
-    transform: scale(1.05);
+    
 }
 
 

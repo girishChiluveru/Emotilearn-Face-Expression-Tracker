@@ -6,7 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "author": "Girish.C",
+  "author": "Vignesh K",
   "license": "ISC",
   "description": "",
   "dependencies": {
