@@ -1,0 +1,114 @@
+/* General Reset */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f1f8ff;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+
+/* Container for the registration screen */
+
+.start-screen {
+    background-color: #ffffff;
+    padding: 40px 30px;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+    margin: 20px;
+}
+
+
+/* Heading style */
+
+h1 {
+    font-size: 2rem;
+    color: #4e79a7;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+
+/* Label for the input field */
+
+label {
+    display: block;
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 8px;
+    text-align: left;
+    margin-left: 10px;
+}
+
+
+/* Input field style */
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0 20px;
+    border: 2px solid #4e79a7;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+
+/* Focus state for input */
+
+input:focus {
+    border-color: #00796b;
+}
+
+
+/* Button style */
+
+.submit-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #4e79a7;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+
+/* Button hover effect */
+
+.submit-button:hover {
+    background-color: #388e3c;
+}
+
+
+/* Media Query for Responsive Design */
+
+@media (max-width: 600px) {
+    .start-screen {
+        padding: 30px 20px;
+    }
+    h1 {
+        font-size: 1.8rem;
+    }
+    input,
+    .submit-button {
+        font-size: 1rem;
+        padding: 10px;
+    }
+}

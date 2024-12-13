@@ -84,9 +84,13 @@ function AnimalGame({ onanimal, childName, sessionId }) {
           setCurrentLetterIndex((prevIndex) => prevIndex + 1);
 
           if (currentLetterIndex + 1 === currentAnimal.name.length) {
-            sendScoreToBackend(); // This function is called only once, when the game ends
+            sendScoreToBackend(); // Send score when the game ends
             setGameOver(true);
           }
+        } else {
+          // Incorrect letter clicked
+          sendScoreToBackend(); // Optional: Send current score before transitioning
+          navigate('/memory-game'); // Navigate to the next game
         }
       }
     });

@@ -1,12 +1,13 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import '../styles/MemoryGame.css';
 import Capturing from './Capturing';
 import { useNavigate } from 'react-router-dom';
 import Confetti from 'react-confetti'; // Import the Confetti library
 import { useWindowSize } from 'react-use'; // For dynamic confetti size
+import { Alert } from 'react-bootstrap'; // Import Bootstrap's Alert component
 
 const gameId = "3";
 const colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A6', '#F3FF33', '#33FFF6', '#A6FF33', '#33A6FF'];
@@ -21,6 +22,7 @@ function MemoryGame({ onFinish, childName, sessionId }) {
   const [gameWon, setGameWon] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false); // State for confetti
   const { width, height } = useWindowSize(); // Get window dimensions for confetti
+  const [alert, setAlert] = useState({ show: false, variant: '', message: '' }); // State for Bootstrap alert
 
   useEffect(() => {
     initializeGrid();
@@ -82,15 +84,23 @@ function MemoryGame({ onFinish, childName, sessionId }) {
     setTimeout(() => {
       setShowConfetti(false); // Stop confetti after 10 seconds
       const finalScore = calculateScore(movesRemaining);
-      if (success) {
-        alert(`Congratulations! You've Have completed all the games!`);
-      } else {
-        alert(`Game Over!`);
-      }
+
+      // Show Bootstrap alert
+      setAlert({
+        show: true,
+        variant: success ? 'success' : 'danger',
+        message: success
+          ? "Congratulations! You've completed all the games!"
+          : "Game Over!",
+      });
 
       if (onFinish) onFinish(finalScore);
-      navigate('/'); // Navigate after the alert
-    }, 10000); // Delay alert for 10 seconds
+
+      // Delay navigation to allow user to see the alert
+      setTimeout(() => {
+        navigate('/');
+      }, 3000);
+    }, 10000);
   }
 
   function calculateScore(movesRemaining) {
@@ -118,6 +128,17 @@ function MemoryGame({ onFinish, childName, sessionId }) {
       <h2>Score: {calculateScore(attemptsLeft)}</h2>
       <h2>Attempts Left: {attemptsLeft}</h2>
 
+      {alert.show && (
+        <Alert
+          variant={alert.variant}
+          onClose={() => setAlert({ ...alert, show: false })}
+          dismissible
+          style={{ marginTop: '20px' }}
+        >
+          {alert.message}
+        </Alert>
+      )}
+
       <div style={{ display: 'flex', flexWrap: 'wrap', width: '320px', margin: '0 auto' }}>
         {grid.map((color, index) => (
           <div
@@ -143,4 +164,4 @@ function MemoryGame({ onFinish, childName, sessionId }) {
   );
 }
 
-export default MemoryGame
+export default MemoryGame;

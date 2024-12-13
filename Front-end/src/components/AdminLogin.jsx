@@ -44,6 +44,7 @@ const AdminLogin = ({ onAdminLogin }) => {
             onChange={(e) => setAdminPassword(e.target.value)}
           />
         </div>
+        <br />
         <button type="submit">Login</button>
         {loginError && <p className="error-message">{loginError}</p>}
       </form>

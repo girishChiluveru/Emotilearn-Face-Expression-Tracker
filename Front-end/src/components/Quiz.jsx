@@ -6,6 +6,8 @@ import { useEffect, useState, useRef } from 'react';
 import Question from './Question';
 import { questions } from '../data/questions';
 import '../styles/Quiz.css';
+import cameraAccessImage from '../assets/camera-access.png';
+
 import Capturing from './Capturing';
 import { useNavigate } from 'react-router-dom';
 
@@ -73,6 +75,7 @@ const Quiz = ({ onQuizEnd, childName, sessionId }) => {
     return (
       <div className="quiz">
         <h2>Giving Access to Camera</h2>
+        <img src={cameraAccessImage} className="cameraaccess-image" alt="Camera Access" />
         <video
           ref={videoRef}
           autoPlay

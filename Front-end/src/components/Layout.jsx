@@ -1,21 +1,13 @@
 /* eslint-disable react/prop-types */
 
 import { Link } from 'react-router-dom';
-// import '../styles/Layout.css'; // Adjust CSS path as needed
+import NavbarComponent from './Navbar'; // Import your Navbar component
 
 const Layout = ({ children, hideNavbar }) => {
   return (
     <div>
-      {/* Conditionally render the navbar */}
-      {!hideNavbar && (
-        <nav className="navbar">
-          <span className="logo">EMOTILEARN</span>
-          <div>
-            <Link to="/admin-login">Admin Login</Link>
-            <Link to="/child-login">Play Game</Link>
-          </div>
-        </nav>
-      )}
+      {/* Conditionally render the NavbarComponent */}
+      {!hideNavbar && <NavbarComponent />}
 
       {/* Main content of the page */}
       <div className="content">
