@@ -51,11 +51,12 @@
     border-radius: 10px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
+    width: 50rem;
 }
 
 .hero-button:hover {
-    background-color: #e15b50;
-    
+    background-color: #4e79a2;
+    transform: scale(1.05);
 }
 
 
