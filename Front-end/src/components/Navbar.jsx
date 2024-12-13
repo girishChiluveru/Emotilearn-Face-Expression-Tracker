@@ -29,7 +29,8 @@ const Navbar = () => {
         toast.error(`Logout failed: ${errorData.error}`);
       }
     } catch (error) {
-      toast.error('An error occurred during logout. Please try again.');
+      console.log(error);
+      
     }
   };
 
