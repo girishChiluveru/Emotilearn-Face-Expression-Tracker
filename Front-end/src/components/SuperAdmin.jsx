@@ -87,7 +87,7 @@ function SuperAdmin() {
                     Admin
                 </Button>
                 <Button
-                    variant={view === "child" ? "success" : "outline-success"}
+                    variant={view === "child" ? "warning" : "outline-warning"}
                     onClick={() => setView("child")}
                 >
                     Child
