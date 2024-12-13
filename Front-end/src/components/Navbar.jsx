@@ -53,14 +53,15 @@ const Navbar = () => {
             <li className="nav-item">
               <Link className="nav-link" to="/child-register">Child Register</Link>
             </li>
-            {!!child && <li className="nav-item">
+            
+            <li className="nav-item">
               <button
-              className="nav-link btn btn-link"
+              className="nav-btn "
               onClick={handleLogout}
                 >
                 Logout
               </button>
-              </li>}
+              </li>
             
           </ul>
         </div>

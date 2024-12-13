@@ -79,3 +79,10 @@
         font-size: 0.8rem;
     }
 }
+
+.cameraaccess-image {
+    width: 80%;
+    /* This will make the image take up the full width of its container */
+    height: min-content;
+    /* This maintains the aspect ratio of the image */
+}

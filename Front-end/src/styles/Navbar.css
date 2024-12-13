@@ -199,3 +199,17 @@
         /* Reduced margin for small screens */
     }
 }
+
+#nav-btn {
+    font-size: 1.2rem;
+    margin: 0 10px;
+    text-transform: capitalize;
+    transition: all 0.3s ease-in-out;
+}
+
+#nav-btn {
+    color: #ffeb3b !important;
+    /* Yellow on hover */
+    font-weight: bold;
+    transform: scale(1.1);
+}

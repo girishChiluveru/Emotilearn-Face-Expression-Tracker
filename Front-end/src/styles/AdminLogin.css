@@ -7,126 +7,102 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f4f8;
+    font-family: 'Arial', sans-serif;
+    background-color: #f1f8ff;
     color: #333;
-}
-
-
-/* Admin Login Styling */
-
-.admin-login-form {
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
+}
+
+
+/* Container for the Admin login form */
+
+.admin-login-form {
     background-color: #ffffff;
-    padding: 20px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 40px 30px;
     border-radius: 10px;
-}
-
-.admin-login-form h1 {
-    font-size: 2.2rem;
-    color: #d32f2f;
-    margin-bottom: 25px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     text-align: center;
-    letter-spacing: 1px;
-}
-
-.admin-login-form form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
     max-width: 400px;
-}
-
-
-/* Input Group Styling */
-
-.admin-login-form .input-group {
     width: 100%;
-    margin-bottom: 20px;
+    margin: 20px;
 }
 
-.admin-login-form label {
+
+/* Heading style */
+
+h1 {
+    font-size: 2rem;
+    color: #4e79a7;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+
+/* Label for the input field */
+
+label {
+    display: block;
     font-size: 1rem;
     color: #555;
     margin-bottom: 8px;
-    display: block;
+    text-align: left;
+    margin-left: 10px;
 }
 
 
-/* Input Field Styling */
+/* Input field style */
 
-.admin-login-form input {
+input {
     width: 100%;
     padding: 12px;
+    margin: 10px 0 20px;
+    border: 2px solid #4e79a7;
+    border-radius: 8px;
     font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 8px;
     outline: none;
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.admin-login-form input:focus {
-    border-color: #d32f2f;
-    box-shadow: 0 0 5px rgba(211, 47, 47, 0.5);
+    transition: border-color 0.3s;
 }
 
 
-/* Button Styling */
+/* Focus state for input */
 
-.admin-login-form button {
+input:focus {
+    border-color: #00796b;
+}
+
+
+/* Button style */
+
+button {
     width: 100%;
-    background-color: #d32f2f;
-    color: white;
     padding: 12px;
-    font-size: 1.1rem;
-    font-weight: bold;
+    background-color: #4e79a7;
+    color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
+    font-size: 1.1rem;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: background-color 0.3s ease;
     margin-top: 10px;
 }
 
-.admin-login-form button:hover {
-    background-color: #b71c1c;
+
+/* Button hover effect */
+
+button:hover {
+    background-color: #388e3c;
 }
 
-.admin-login-form button:active {
-    transform: scale(0.97);
-}
 
-
-/* Error Message Styling */
+/* Error message style */
 
 .error-message {
-    color: #d32f2f;
-    font-size: 0.9rem;
+    color: red;
     margin-top: 10px;
-    text-align: center;
-}
-
-
-/* Accessibility Improvements */
-
-.admin-login-form input:invalid {
-    border-color: #d32f2f;
-    box-shadow: 0 0 5px rgba(211, 47, 47, 0.3);
-}
-
-.admin-login-form input:invalid:focus {
-    border-color: #ff616f;
-}
-
-.admin-login-form button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
+    font-size: 0.9rem;
 }
 
 
@@ -134,13 +110,13 @@ body {
 
 @media (max-width: 600px) {
     .admin-login-form {
-        padding: 20px 15px;
+        padding: 30px 20px;
     }
-    .admin-login-form h1 {
+    h1 {
         font-size: 1.8rem;
     }
-    .admin-login-form input,
-    .admin-login-form button {
+    input,
+    button {
         font-size: 1rem;
         padding: 10px;
     }
