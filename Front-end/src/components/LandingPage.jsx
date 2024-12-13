@@ -27,7 +27,7 @@ const LandingPage = () => {
         <div className="about-section">
           <h2>About Us</h2>
           <p>
-            At MyProject, we believe that learning should be an exciting adventure. We provide a unique platform filled with fun, interactive games designed to engage and educate children of all ages. Our tools not only enhance learning but also track progress in a way that helps children grow, develop, and excel at their own pace.
+            At Emot-Learn, we believe that learning should be an exciting adventure. We provide a unique platform filled with fun, interactive games designed to engage and educate children of all ages. Our tools not only enhance learning but also track progress in a way that helps children grow, develop, and excel at their own pace.
           </p>
           <p>
             Our mission is to help children discover the joy of learning, encouraging curiosity and the pursuit of knowledge while making sure the process is enjoyable and effective. Whether it’s through games that teach foundational skills or activities that promote critical thinking, we’re here to make education as fun and engaging as it should be.

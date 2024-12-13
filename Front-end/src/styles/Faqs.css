@@ -1,0 +1,49 @@
+.faqs-container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.faqs-list {
+    max-height: 400px;
+    /* Optional: set a max height for the FAQ list */
+    overflow-y: scroll;
+    /* Enables scroll if content exceeds max height */
+    scrollbar-width: none;
+    /* For Firefox */
+    -ms-overflow-style: none;
+    /* For Internet Explorer 10+ */
+}
+
+.faqs-list::-webkit-scrollbar {
+    display: none;
+    /* Hides the scrollbar in Webkit browsers (Chrome, Safari) */
+}
+
+.faq-item {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    cursor: pointer;
+}
+
+.faq-question {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #00796b;
+    padding: 10px;
+}
+
+.faq-answer {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #333;
+    padding-left: 20px;
+    padding-top: 10px;
+}
+
+.faq-item:hover .faq-question {
+    color: #004d40;
+    /* Change color on hover */
+}

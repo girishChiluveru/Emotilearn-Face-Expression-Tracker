@@ -213,3 +213,71 @@
     font-weight: bold;
     transform: scale(1.1);
 }
+
+
+/* Navbar.css */
+
+
+/* Custom brand styles */
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+
+/* Nav links */
+
+.navbar-nav .nav-link {
+    font-size: 1rem;
+    color: #555;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #007bff;
+}
+
+
+/* Toggler button */
+
+.navbar-toggler {
+    border: none;
+    outline: none;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23333' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(0,0,0,0.5)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+
+/* Collapsible navbar styles */
+
+.collapse {
+    transition: height 0.35s ease;
+}
+
+
+/* Align buttons or links to the right */
+
+.navbar-nav.ms-auto {
+    margin-left: auto;
+}
+
+
+/* Logout button styles */
+
+.nav-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.nav-btn:hover {
+    background-color: #b52a38;
+    color: #fff;
+}

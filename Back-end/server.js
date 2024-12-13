@@ -13,7 +13,7 @@ const analyzeRoutes = require('./routes/analyze');
 const emotionRoutes = require('./routes/storeEmotions');
 const storeScoresRoutes = require('./routes/storeScores');
 const dotenv = require('dotenv').config();
-const cookieParser =require('cookie-parser');
+const cookieParser = require('cookie-parser');
 
 
 const app = express();
@@ -30,7 +30,7 @@ connectToMongoDB(process.env.CONNECTION_STRING)
 
 app.use(cors({
     credentials: true,
-    origin: ['http://localhost:5173','http://192.168.0.103:5173'] // Frontend origin
+    origin: ['http://localhost:5173', 'http://192.168.0.103:5173'] // Frontend origin
 }));
 
 
@@ -52,8 +52,8 @@ const Admin = require('./models/Admin');
 const Report = require('./models/report');
 
 app.use(express.json()); // Parse JSON payloads
-app.use(express.urlencoded({ extended: true })); 
-app.get('/children', async (req, res) => {
+app.use(express.urlencoded({ extended: true }));
+app.get('/children', async(req, res) => {
     try {
         const children = await Report.find();
         res.json(children);
@@ -63,7 +63,7 @@ app.get('/children', async (req, res) => {
 });
 
 // 2. Create a new child
-app.post('/children', async (req, res) => {
+app.post('/children', async(req, res) => {
     try {
         const newChild = new Report(req.body);
         await newChild.save();
@@ -74,7 +74,7 @@ app.post('/children', async (req, res) => {
 });
 
 // 3. Update child details
-app.put('/children/:id', async (req, res) => {
+app.put('/children/:id', async(req, res) => {
     try {
         const updatedChild = await Report.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(updatedChild);
@@ -84,7 +84,7 @@ app.put('/children/:id', async (req, res) => {
 });
 
 // 4. Delete a child
-app.delete('/children/:id', async (req, res) => {
+app.delete('/children/:id', async(req, res) => {
     try {
         await Report.findByIdAndDelete(req.params.id);
         res.json({ message: "Child deleted successfully" });
@@ -94,7 +94,7 @@ app.delete('/children/:id', async (req, res) => {
 });
 
 // 5. Update session's isProcessed
-app.patch('/sessions/:childId/:sessionId', async (req, res) => {
+app.patch('/sessions/:childId/:sessionId', async(req, res) => {
     try {
         const { childId, sessionId } = req.params;
         const { isProcessed } = req.body;
@@ -116,7 +116,7 @@ app.patch('/sessions/:childId/:sessionId', async (req, res) => {
 
 
 // Get all admins
-app.get('/admins', async (req, res) => {
+app.get('/admins', async(req, res) => {
     try {
         const admins = await Admin.find();
         res.json(admins);
@@ -126,7 +126,7 @@ app.get('/admins', async (req, res) => {
 });
 
 // Create a new admin
-app.post('/admins', async (req, res) => {
+app.post('/admins', async(req, res) => {
     try {
         const newAdmin = new Admin(req.body);
         await newAdmin.save();
@@ -137,7 +137,7 @@ app.post('/admins', async (req, res) => {
 });
 
 // Update an admin
-app.put('/admins/:id', async (req, res) => {
+app.put('/admins/:id', async(req, res) => {
     try {
         const updatedAdmin = await Admin.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(updatedAdmin);
@@ -147,7 +147,7 @@ app.put('/admins/:id', async (req, res) => {
 });
 
 // Delete an admin
-app.delete('/admins/:id', async (req, res) => {
+app.delete('/admins/:id', async(req, res) => {
     try {
         await Admin.findByIdAndDelete(req.params.id);
         res.json({ message: "Admin deleted successfully" });

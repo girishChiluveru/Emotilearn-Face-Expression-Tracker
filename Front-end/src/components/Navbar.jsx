@@ -1,18 +1,12 @@
-/* eslint-disable no-undef */
-/* eslint-disable no-unused-vars */
 import { Link } from 'react-router-dom';
 import '../styles/Navbar.css';
 import { UserContext } from '../../context/userContext';
 import { useContext } from 'react';
 import { toast } from "react-hot-toast";
 
-
-
-
 const Navbar = () => {
 
   const { child, setChild } = useContext(UserContext);
-
 
   const handleLogout = async () => {
     try {
@@ -29,14 +23,12 @@ const Navbar = () => {
         toast.error(`Logout failed: ${errorData.error}`);
       }
     } catch (error) {
-      toast.error('An error occurred during logout. Please try again.');
+      toast.error("Logout failed");
     }
   };
 
-
-
   return (
-    <nav className="navbar navbar-expand-lg navbar-light ">
+    <nav className="navbar navbar-expand-lg navbar-light">
       <div className="container-fluid">
         <Link className="navbar-brand" to="/">Emoti-Learn</Link>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,16 +45,12 @@ const Navbar = () => {
             <li className="nav-item">
               <Link className="nav-link" to="/child-register">Child Register</Link>
             </li>
-            
             <li className="nav-item">
-              <button
-              className="nav-btn "
-              onClick={handleLogout}
-                >
-                Logout
-              </button>
-              </li>
-            
+              <Link className="nav-link" to="/Faqs">FAQ</Link> {/* Add this link */}
+            </li>
+            <li className="nav-item">
+              <button className="nav-btn" onClick={handleLogout}>Logout</button>
+            </li>
           </ul>
         </div>
       </div>
