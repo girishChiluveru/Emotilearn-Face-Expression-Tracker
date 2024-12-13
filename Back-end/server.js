@@ -48,7 +48,7 @@ app.use('/store-scores', storeScoresRoutes);
 app.use('/', require('./routes/authRoutes'));
 
 
-
+const Admin = require('./models/Admin');
 const Report = require('./models/report');
 
 app.use(express.json()); // Parse JSON payloads
@@ -113,7 +113,49 @@ app.patch('/sessions/:childId/:sessionId', async (req, res) => {
     }
 });
 
-// Start the server
+
+
+// Get all admins
+app.get('/admins', async (req, res) => {
+    try {
+        const admins = await Admin.find();
+        res.json(admins);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Create a new admin
+app.post('/admins', async (req, res) => {
+    try {
+        const newAdmin = new Admin(req.body);
+        await newAdmin.save();
+        res.status(201).json(newAdmin);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+// Update an admin
+app.put('/admins/:id', async (req, res) => {
+    try {
+        const updatedAdmin = await Admin.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(updatedAdmin);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+// Delete an admin
+app.delete('/admins/:id', async (req, res) => {
+    try {
+        await Admin.findByIdAndDelete(req.params.id);
+        res.json({ message: "Admin deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
