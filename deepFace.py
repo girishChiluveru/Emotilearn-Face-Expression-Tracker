@@ -58,7 +58,7 @@ def analyze_emotions():
 
         # Analyze emotions using DeepFace
         try:
-            res = DeepFace.analyze(img, actions=['emotion'], detector_backend='opencv', enforce_detection=False)
+            res = DeepFace.analyze(img, actions=['emotion'], detector_backend='opencv', enforce_detection=True)
             if isinstance(res, list):
                 res = res[0]
 
