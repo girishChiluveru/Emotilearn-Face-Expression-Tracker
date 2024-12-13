@@ -47,9 +47,9 @@ const loginChild = async (e) => {
 
   return (
     <div className="start-screen">
-      <h1>Child Login</h1>
+      <h1>Login</h1>
       <form onSubmit={loginChild}>
-        <label htmlFor="childName">Enter child name:</label>
+        <label htmlFor="childName">Enter name:</label>
         <input
           type="text"
           placeholder="Enter name"
