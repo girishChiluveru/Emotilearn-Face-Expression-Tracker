@@ -29,7 +29,7 @@
 | Backend    | Node.js, Express                                  |
 | AI Models  | DeepFace, Hugging Face ViT                        |
 | Database   | MongoDB                                           |
-                         |
+                         
 
 ## Setup Instructions
 
