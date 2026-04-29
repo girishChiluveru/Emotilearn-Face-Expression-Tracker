@@ -17,7 +17,8 @@ const cookieParser = require('cookie-parser');
 
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 app.use(cookieParser());
 
@@ -30,7 +31,7 @@ connectToMongoDB(process.env.CONNECTION_STRING)
 
 app.use(cors({
     credentials: true,
-    origin: ['http://localhost:5173', 'http://192.168.0.103:5173'] // Frontend origin
+    origin: [FRONTEND_URL] // Frontend origin
 }));
 
 

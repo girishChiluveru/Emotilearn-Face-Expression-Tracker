@@ -23,7 +23,7 @@
     "react-router-dom": "^6.28.0",
     "react-use": "^17.5.1",
     "recharts": "^2.13.0",
-    "uuid": "^11.0.3",
+    "uuid": "^14.0.0",
     "victory": "^37.3.2"
   },
   "devDependencies": {
