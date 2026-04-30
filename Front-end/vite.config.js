@@ -6,11 +6,8 @@ export default defineConfig({
     plugins: [react()],
     server: {
         host: '0.0.0.0',
-        proxy: {
-            '/register': 'http://localhost:3000',
-            '/login': 'http://localhost:3000',
-            '/logout': 'http://localhost:3000',
-
-        },
+        // Removed proxies for /login, /register, etc. 
+        // as they conflict with React Router's frontend routes.
+        // We now use absolute URLs or a specific API prefix.
     },
 })

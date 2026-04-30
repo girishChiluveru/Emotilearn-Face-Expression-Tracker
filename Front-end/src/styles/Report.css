@@ -1,194 +1,334 @@
-.container {
-    margin: 0 auto;
-    padding: 20px;
-    max-width: 1200px;
-    font-family: Arial, sans-serif;
-    overflow: auto;
-    /* Enables scrolling if content exceeds viewport */
-    height: 100vh;
-    /* Ensures container uses full height */
-    box-sizing: border-box;
-    /* Prevents padding from affecting dimensions */
+/* ═══════════════════════════════════════════════════════════════
+   Report.css — Full-width table layout with proper hierarchy
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Page wrapper ─────────────────────────────────────────────── */
+.report-page {
+  min-height: 100vh;
+  padding: 5.5rem 2rem 2rem;           /* top accounts for fixed navbar */
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: 'Nunito', sans-serif;
+  box-sizing: border-box;
 }
 
-
-/* Heading */
-
-.heading {
-    text-align: center;
-    color: #007bff;
-    font-size: 24px;
-    margin-bottom: 20px;
+/* ── Header area ──────────────────────────────────────────────── */
+.report-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-
-/* Table styling */
-
-.table-container {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow-y: auto;
-    /* Enable vertical scrolling */
-    max-height: 500px;
-    /* Set a fixed height for scrolling */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.report-page__title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
 }
 
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #fff;
+.report-page__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FF6B35, #FFD166);
+  box-shadow: 0 4px 14px rgba(255, 107, 53, 0.3);
+  flex-shrink: 0;
 }
 
-.table th,
-.table td {
-    padding-left: 50px;
-    padding-right: 50px;
-    text-align: center;
-    border: 1px solid #ddd;
+.report-page__title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.6rem;
+  color: #2d3436;
+  margin: 0;
+  line-height: 1.2;
 }
 
-.table th {
-    padding: 20px;
-    background-color: #f4f4f4;
-    font-weight: bold;
-    color: #333;
-    position: sticky;
-    /* Makes the table header sticky */
-    top: 0;
-    /* Sticks the header to the top of the table container */
-    z-index: 2;
-    /* Keeps the header above other content */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    /* Adds slight shadow for visibility */
+.report-page__subtitle {
+  font-size: 0.82rem;
+  color: #999;
+  margin: 0.1rem 0 0;
+  font-weight: 600;
 }
 
-.table tbody tr:hover {
-    background-color: #f9f9f9;
+/* ── Search bar ───────────────────────────────────────────────── */
+.report-page__search {
+  position: relative;
+  width: 320px;
+  max-width: 100%;
 }
 
-
-/* Buttons */
-
-.btn {
-    padding: 5px 10px;
-    border: none;
-    height: 50px;
-    width: 150px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
+.report-page__search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #b2bec3;
+  pointer-events: none;
 }
 
-.btn.success {
-    background-color: #28a745;
-    color: white;
+.report-page__search-input {
+  width: 100%;
+  padding: 0.65rem 1rem 0.65rem 2.5rem;
+  border-radius: 12px;
+  border: 2px solid #e8e8e8;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2d3436;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
 }
 
-.btn.warning {
-    background-color: #ffc107;
-    color: white;
+.report-page__search-input:focus {
+  border-color: #FF6B35;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
 }
 
-.btn:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
+/* ── Loading state ────────────────────────────────────────────── */
+.report-page__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 3rem;
+  font-weight: 700;
+  color: #999;
+  font-size: 1rem;
 }
 
-.spinner {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid #f3f3f3;
-    border-radius: 50%;
-    border-top: 2px solid #007bff;
-    animation: spin 0.8s linear infinite;
+/* ── Table wrapper ────────────────────────────────────────────── */
+.report-page__table-wrap {
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f0f0f0;
 }
 
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+/* ── Table ────────────────────────────────────────────────────── */
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-
-/* Modal styling */
-
-.modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(11, 225, 54, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.report-table__th {
+  padding: 0.9rem 1.25rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #636e72;
+  background: #fafafa;
+  border-bottom: 2px solid #f0f0f0;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
-.modal {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px #13f40333;
-    width: 300px;
-    max-width: 90%;
+.report-table__th--center {
+  text-align: center;
 }
 
-.modal-header,
-.modal-footer {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
+/* ── Table rows ───────────────────────────────────────────────── */
+.report-table__row {
+  transition: background 0.2s;
 }
 
-.modal-footer {
-    border-top: none;
-    text-align: right;
+.report-table__row:hover {
+  background: #fef9f5;
 }
 
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    float: right;
+.report-table__td {
+  padding: 0.8rem 1.25rem;
+  font-size: 0.9rem;
+  color: #2d3436;
+  border-bottom: 1px solid #f5f5f5;
+  vertical-align: middle;
 }
 
-.modal-body {
-    padding: 15px;
-    text-align: center;
+.report-table__td--num {
+  font-weight: 800;
+  color: #b2bec3;
+  width: 60px;
 }
 
-div {
-    box-sizing: border-box;
+.report-table__td--name {
+  font-weight: 700;
 }
 
-.selection-bar {
-    background-color: #f0f0f0;
-    padding: 10px;
-    margin-bottom: 20px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    border-bottom: 2px solid #ddd;
+.report-table__td--mono {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.78rem;
+  color: #999;
 }
 
-.charts-container {
-    display: flex;
+.report-table__td--center {
+  text-align: center;
+}
+
+/* ── Name badge ───────────────────────────────────────────────── */
+.report-table__name-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  background: rgba(255, 107, 53, 0.08);
+  color: #FF6B35;
+}
+
+/* ── Sample count badge ───────────────────────────────────────── */
+.report-table__sample-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 0.82rem;
+  background: #f0f0f0;
+  color: #b2bec3;
+}
+
+.report-table__sample-badge--has-data {
+  background: rgba(6, 214, 160, 0.1);
+  color: #06D6A0;
+}
+
+/* ── Action buttons ───────────────────────────────────────────── */
+.report-table__action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+
+.report-table__action-btn--active {
+  background: linear-gradient(135deg, #06D6A0, #4CC9F0);
+  color: #fff;
+  box-shadow: 0 3px 12px rgba(6, 214, 160, 0.3);
+}
+
+.report-table__action-btn--active:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(6, 214, 160, 0.4);
+}
+
+.report-table__action-btn--disabled {
+  background: #f0f0f0;
+  color: #b2bec3;
+  cursor: not-allowed;
+}
+
+/* ── Empty state ──────────────────────────────────────────────── */
+.report-table__empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: #b2bec3;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* ── Modal ────────────────────────────────────────────────────── */
+.report-page__modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.report-page__modal {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  width: 340px;
+  max-width: 90%;
+  overflow: hidden;
+}
+
+.report-page__modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.report-page__modal-header h5 {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.report-page__modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+}
+
+.report-page__modal-body {
+  padding: 1.25rem;
+  font-size: 0.9rem;
+  color: #636e72;
+  text-align: center;
+}
+
+.report-page__modal-footer {
+  padding: 0.75rem 1.25rem;
+  text-align: right;
+  border-top: 1px solid #f0f0f0;
+}
+
+.report-page__modal-btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(135deg, #FF6B35, #FFD166);
+}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .report-page {
+    padding: 5rem 1rem 1.5rem;
+  }
+
+  .report-page__header {
     flex-direction: column;
-    gap: 20px;
-    /* Space between charts */
-    margin-top: 20px;
-    /* Ensure separation from the selection bar */
-    padding: 10px;
-}
+    align-items: flex-start;
+  }
 
-.bar-chart {
+  .report-page__search {
     width: 100%;
-    /* Make the chart responsive */
-    max-width: 600px;
-    margin: 0 auto;
-    /* Center align */
+  }
+
+  .report-table__th,
+  .report-table__td {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.82rem;
+  }
 }

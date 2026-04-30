@@ -1,163 +1,145 @@
+/* eslint-disable no-unused-vars */
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Search, FileText, AlertTriangle, X, Loader2, BarChart3 } from 'lucide-react';
+import '../styles/Report.css';
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import "../styles/Report.css";
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const ReportsTable = () => {
   const navigate = useNavigate();
-  const [reports, setReports] = useState([]);
-  const [filteredReports, setFilteredReports] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [analyzingSession, setAnalyzingSession] = useState(null);
-  const [modalMessage, setModalMessage] = useState("");
-  const [showModal, setShowModal] = useState(false);
+  const [reports, setReports]             = useState([]);
+  const [filteredReports, setFiltered]    = useState([]);
+  const [searchQuery, setSearchQuery]     = useState('');
+  const [loading, setLoading]             = useState(false);
+  const [modalMessage, setModalMessage]   = useState('');
+  const [showModal, setShowModal]         = useState(false);
 
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://127.0.0.1:3000/reports");
-      if (!response.ok) {
-        throw new Error(`Server responded with status ${response.status}`);
-      }
+      const response = await fetch(`${API_URL}/reports`, { credentials: 'include' });
+      if (!response.ok) throw new Error(`Status ${response.status}`);
       const data = await response.json();
       setReports(data);
-      setFilteredReports(data);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (error) {
-      console.error("Error fetching reports:", error);
-      setModalMessage("Error fetching reports. Please try again later.");
-      //setShowModal(true);
+      setFiltered(data);
+    } catch (err) {
+      console.error('Error fetching reports:', err);
+      setModalMessage('Error fetching reports. Please try again later.');
+      setShowModal(true);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAnalyze = async (childName, sessionId) => {
-    setAnalyzingSession(sessionId);
-    try {
-      const response = await fetch("http://127.0.0.1:3000/process", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sessionId, childName }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Server responded with status ${response.status}`);
-      }
-
-      setModalMessage(`Analysis for session ${sessionId} completed successfully!`);
-      setShowModal(true);
-      //fetchReports(); // Refresh reports after analysis
-      navigate("/child-report",{
-        state:{childName,sessionId}
-      })
-    } catch (error) {
-      console.error("Error processing analysis:", error);
-      setModalMessage(`Failed to process analysis for session ${sessionId}.`);
-      setShowModal(true);
-    } finally {
-      setAnalyzingSession(null);
-      //setShowModal(true);
-    }
+  // Sessions now contain emotion_events — therapist can view them directly
+  const handleViewSession = (childName, sessionId) => {
+    navigate('/child-report', { state: { childName, sessionId } });
   };
 
-  const handleViewReports = (childName, sessionId) => {
-    navigate("/child-report", {
-      state: { childName, sessionId },
-    });
+  const handleSearch = (e) => {
+    const q = e.target.value.toLowerCase();
+    setSearchQuery(q);
+    setFiltered(q ? reports.filter((r) => r.childname.toLowerCase().includes(q)) : reports);
   };
 
-  const handleSearch = (event) => {
-    const query = event.target.value.toLowerCase();
-    setSearchQuery(query);
-    if (!query) {
-      setFilteredReports(reports);
-    } else {
-      const filtered = reports.filter((report) =>
-        report.childname.toLowerCase().includes(query)
-      );
-      setFilteredReports(filtered);
-    }
-  };
-
-  useEffect(() => {
-    fetchReports();
-  }, []);
+  useEffect(() => { fetchReports(); }, []);
 
   return (
-    <div className="container">
-      <h1 className="heading">Reports Table</h1>
-      <div className="search-bar">
-        <input
-          type="text"
-          placeholder="Search by child name..."
-          value={searchQuery}
-          onChange={handleSearch}
-        />
+    <div className="report-page">
+      {/* Page header */}
+      <div className="report-page__header">
+        <div className="report-page__title-group">
+          <div className="report-page__icon">
+            <BarChart3 size={22} color="white" />
+          </div>
+          <div>
+            <h1 className="report-page__title">Session Reports</h1>
+            <p className="report-page__subtitle">
+              {filteredReports.length} child{filteredReports.length !== 1 ? 'ren' : ''} found
+            </p>
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="report-page__search">
+          <Search size={16} className="report-page__search-icon" />
+          <input
+            id="report-search-input"
+            type="text"
+            placeholder="Search by child name..."
+            value={searchQuery}
+            onChange={handleSearch}
+            className="report-page__search-input"
+          />
+        </div>
       </div>
 
+      {/* Table */}
       {loading ? (
-        <p className="loading-text">Loading...</p>
+        <div className="report-page__loading">
+          <Loader2 size={28} className="animate-spin" style={{ color: '#FF6B35' }} />
+          <span>Loading reports…</span>
+        </div>
       ) : (
-        <div className="table-container">
-          <table className="table">
+        <div className="report-page__table-wrap">
+          <table className="report-table" id="reports-table">
             <thead>
               <tr>
-                <th>S.No</th>
-                <th>Child Name</th>
-                <th>Session IDs</th>
-                <th>Actions</th>
+                <th className="report-table__th">#</th>
+                <th className="report-table__th">Child Name</th>
+                <th className="report-table__th">Session ID</th>
+                <th className="report-table__th">Date</th>
+                <th className="report-table__th report-table__th--center">Emotion Samples</th>
+                <th className="report-table__th report-table__th--center">Action</th>
               </tr>
             </thead>
             <tbody>
               {filteredReports.length > 0 ? (
-                filteredReports.map((report, index) =>
-                  report.sessions.map((session, sessionIndex) => (
-                    <tr key={`${report.childname}-${session.sessionid}`}>
-                      {sessionIndex === 0 && (
-                        <>
-                          <td rowSpan={report.sessions.length}>{index + 1}</td>
-                          <td rowSpan={report.sessions.length}>
-                            {report.childname}
-                          </td>
-                        </>
+                filteredReports.flatMap((report, idx) =>
+                  report.sessions.map((session, sIdx) => (
+                    <tr key={`${report.childname}-${session.sessionId}`} className="report-table__row">
+                      {sIdx === 0 && (
+                        <td className="report-table__td report-table__td--num" rowSpan={report.sessions.length}>{idx + 1}</td>
                       )}
-                      <td>{session.sessionid}</td>
-                      <td>
-                        {session.isProcessed ? (
-                          <button
-                            className="btn success"
-                            onClick={() =>
-                              handleViewReports(report.childname, session.sessionid)
-                            }
-                          >
-                            View Reports
-                          </button>
-                        ) : (
-                          <button
-                            className="btn warning"
-                            onClick={() =>
-                              handleAnalyze(report.childname, session.sessionid)
-                            }
-                            disabled={analyzingSession === session.sessionid}
-                          >
-                            {analyzingSession === session.sessionid ? (
-                              <span className="spinner"></span>
-                            ) : (
-                              "Analyze"
-                            )}
-                          </button>
-                        )}
+                      {sIdx === 0 && (
+                        <td className="report-table__td report-table__td--name" rowSpan={report.sessions.length}>
+                          <span className="report-table__name-badge">{report.childname}</span>
+                        </td>
+                      )}
+                      <td className="report-table__td report-table__td--mono">
+                        {session.sessionId?.slice(0, 8)}…
+                      </td>
+                      <td className="report-table__td">
+                        {session.sessiondate
+                          ? new Date(session.sessiondate).toLocaleDateString()
+                          : '—'}
+                      </td>
+                      <td className="report-table__td report-table__td--center">
+                        <span className={`report-table__sample-badge ${session.emotion_events?.length ? 'report-table__sample-badge--has-data' : ''}`}>
+                          {session.emotion_events?.length ?? 0}
+                        </span>
+                      </td>
+                      <td className="report-table__td report-table__td--center">
+                        <button
+                          className={`report-table__action-btn ${session.emotion_events?.length ? 'report-table__action-btn--active' : 'report-table__action-btn--disabled'}`}
+                          onClick={() => handleViewSession(report.childname, session.sessionId)}
+                          disabled={!session.emotion_events?.length}
+                        >
+                          {session.emotion_events?.length ? (
+                            <><FileText size={14} /> View Report</>
+                          ) : 'No Data'}
+                        </button>
                       </td>
                     </tr>
                   ))
                 )
               ) : (
                 <tr>
-                  <td colSpan="4">No records found</td>
+                  <td colSpan="6" className="report-table__empty">
+                    <AlertTriangle size={18} style={{ color: '#ccc' }} />
+                    No records found
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -165,20 +147,19 @@ const ReportsTable = () => {
         </div>
       )}
 
+      {/* Error modal */}
       {showModal && (
-        <div className="modal-backdrop">
-          <div className="modal">
-            <div className="modal-header">
-              <h5>Message</h5>
-              <button className="modal-close" onClick={() => setShowModal(false)}>
-                ×
+        <div className="report-page__modal-backdrop" onClick={() => setShowModal(false)}>
+          <div className="report-page__modal" onClick={(e) => e.stopPropagation()}>
+            <div className="report-page__modal-header">
+              <h5>⚠️ Error</h5>
+              <button className="report-page__modal-close" onClick={() => setShowModal(false)}>
+                <X size={18} />
               </button>
             </div>
-            <div className="modal-body">
-              <p>{modalMessage}</p>
-            </div>
-            <div className="modal-footer">
-              <button onClick={() => setShowModal(false)}>Close</button>
+            <div className="report-page__modal-body">{modalMessage}</div>
+            <div className="report-page__modal-footer">
+              <button className="report-page__modal-btn" onClick={() => setShowModal(false)}>Close</button>
             </div>
           </div>
         </div>

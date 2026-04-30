@@ -3,58 +3,53 @@
 
 import React, { useState, useEffect } from 'react';
 import '../styles/AnimalGame.css';
-import Capturing from './Capturing';
+import EmotionTracker from './EmotionTracker';
+import { useEmotionBackground } from '../hooks/useEmotionBackground';
 import { useNavigate } from 'react-router-dom';
 
-const gameId = "2";
+const GAME_ID = 'animal';
+
 const animals = [
-  { name: 'lion', image: '🦁' },
+  { name: 'lion',  image: '🦁' },
   { name: 'tiger', image: '🐯' },
-  { name: 'bear', image: '🐻' },
+  { name: 'bear',  image: '🐻' },
   { name: 'zebra', image: '🦓' },
 ];
 
 const getRandomAnimal = () => animals[Math.floor(Math.random() * animals.length)];
 
-function AnimalGame({ onanimal, childName, sessionId }) {
+function AnimalGame({ onanimal, childname, sessionId }) {
   const navigate = useNavigate();
-  const [currentAnimal, setCurrentAnimal] = useState(getRandomAnimal());
-  const [letters, setLetters] = useState([]);
+  const { bgStyle, setEmotion } = useEmotionBackground();
+
+  const [currentAnimal, setCurrentAnimal]           = useState(getRandomAnimal());
+  const [letters, setLetters]                       = useState([]);
   const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
-  const [position, setPosition] = useState({ x: 150, y: 150 });
-  const [score, setScore] = useState(0);
-  const [gameOver, setGameOver] = useState(false);
-  const [speed, setSpeed] = useState(7);
+  const [position, setPosition]                     = useState({ x: 150, y: 150 });
+  const [score, setScore]                           = useState(0);
+  const [gameOver, setGameOver]                     = useState(false);
+  const [speed]                                     = useState(7);
+  const [round, setRound]                           = useState(1);
 
   const verticalLanes = [50, 150, 250, 350];
-  const horizontalLanes = [50, 150, 250];
 
   useEffect(() => {
     if (gameOver) return;
-
     const letterInterval = setInterval(() => {
       const randomLetter = currentAnimal.name[Math.floor(Math.random() * currentAnimal.name.length)];
-      const randomLane = verticalLanes[Math.floor(Math.random() * verticalLanes.length)];
-      setLetters((prevLetters) => [
-        ...prevLetters,
-        { letter: randomLetter, x: 400, y: randomLane },
-      ]);
+      const randomLane   = verticalLanes[Math.floor(Math.random() * verticalLanes.length)];
+      setLetters((prev) => [...prev, { letter: randomLetter, x: 400, y: randomLane }]);
     }, 1000);
 
     const gameInterval = setInterval(() => {
-      setLetters((prevLetters) =>
-        prevLetters.map((letter) => ({ ...letter, x: letter.x - speed }))
-      );
+      setLetters((prev) => prev.map((l) => ({ ...l, x: l.x - speed })));
     }, 100);
 
-    return () => {
-      clearInterval(letterInterval);
-      clearInterval(gameInterval);
-    };
+    return () => { clearInterval(letterInterval); clearInterval(gameInterval); };
   }, [currentAnimal, speed, gameOver]);
 
   useEffect(() => {
-    const handleKeyPress = (e) => {
+    const handleKey = (e) => {
       if (e.key === 'ArrowUp') {
         setPosition((prev) => ({
           ...prev,
@@ -67,60 +62,42 @@ function AnimalGame({ onanimal, childName, sessionId }) {
         }));
       }
     };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
   useEffect(() => {
     letters.forEach((letter) => {
       if (letter.x < position.x + 50 && letter.x > position.x && letter.y === position.y) {
-        const expectedLetter = currentAnimal.name[currentLetterIndex];
-
-        if (letter.letter === expectedLetter) {
+        const expected = currentAnimal.name[currentLetterIndex];
+        if (letter.letter === expected) {
           setLetters((prev) => prev.filter((l) => l !== letter));
-          const points = calculateScore(currentAnimal.name, currentLetterIndex);
-          setScore((prevScore) => prevScore + points);
-          setCurrentLetterIndex((prevIndex) => prevIndex + 1);
-
-          if (currentLetterIndex + 1 === currentAnimal.name.length) {
-            sendScoreToBackend(); // Send score when the game ends
+          const pts = currentAnimal.name.length === 4 ? (currentLetterIndex < 2 ? 2 : 3) : 2;
+          setScore((s) => s + pts);
+          const nextIndex = currentLetterIndex + 1;
+          setCurrentLetterIndex(nextIndex);
+          if (nextIndex === currentAnimal.name.length) {
+            onanimal(score + pts);
             setGameOver(true);
           }
         } else {
-          // Incorrect letter clicked
-          sendScoreToBackend(); // Optional: Send current score before transitioning
-          navigate('/memory-game'); // Navigate to the next game
+          onanimal(score);
+          navigate('/memory-game');
         }
       }
     });
   }, [letters, position, currentLetterIndex]);
 
-  const calculateScore = (word, index) => {
-    if (word.length === 4) {
-      return index < 2 ? 2 : 3;
-    } else if (word.length === 5) {
-      return 2;
-    }
-    return 1;
-  };
-
-  const sendScoreToBackend = () => {
-    // Define your logic to send the score to the backend
-    onanimal(score);
-    console.log('Score sent to backend:', score);
-  };
-
   return (
-    <div className="game-container">
-      <Capturing
-        childName={childName}
+    <div className="game-container" style={bgStyle}>
+      <EmotionTracker
+        childname={childname}
         sessionId={sessionId}
-        gameId={gameId}
-        captureInterval={4000}
-        screenshotInterval={4000}
-        uploadUrl="http://localhost:3000/photos"
+        gameId={GAME_ID}
+        qid={`round-${round}`}
+        onEmotion={(emotion) => setEmotion(emotion)}
       />
+
       <h1>Animal Letter Game</h1>
       <p>Score: {score}</p>
       <h2>
@@ -130,6 +107,7 @@ function AnimalGame({ onanimal, childName, sessionId }) {
           </span>
         ))}
       </h2>
+
       {gameOver ? (
         <button onClick={() => navigate('/memory-game')}>Next Game</button>
       ) : (

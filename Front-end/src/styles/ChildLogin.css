@@ -1,116 +1,139 @@
-/* General Reset */
+/* ChildLogin.css — Edge-to-edge login layout */
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+.login-page {
+  min-height: 100vh;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  font-family: 'Nunito', sans-serif;
+  overflow: hidden;
 }
 
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f1f8ff;
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+/* Left — branding */
+.login-page__branding {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 4rem;
 }
 
+.login-page__branding-inner { max-width: 380px; }
 
-/* Container for the login screen */
-
-.start-screen {
-    background-color: #ffffff;
-    padding: 40px 30px;
-    border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    max-width: 400px;
-    width: 100%;
-    margin: 20px;
+.login-page__logo-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1rem;
+  background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);
 }
 
-
-/* Heading style */
-
-h1 {
-    font-size: 2rem;
-    color: #4e79a7;
-    margin-bottom: 20px;
-    font-weight: bold;
+.login-page__brand-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 2.4rem; color: #fff; margin-bottom: 0.5rem;
 }
 
-
-/* Label for the input field */
-
-label {
-    display: block;
-    font-size: 1rem;
-    color: #555;
-    margin-bottom: 8px;
-    text-align: left;
-    margin-left: 10px;
+.login-page__brand-sub {
+  color: rgba(255,255,255,0.85); font-size: 1rem; line-height: 1.6; margin-bottom: 1.5rem;
 }
 
+.login-page__brand-features { display: flex; flex-direction: column; gap: 0.6rem; }
 
-/* Input field style */
-
-input {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0 20px;
-    /* Margin between input and submit button */
-    border: 2px solid #4e79a7;
-    border-radius: 8px;
-    font-size: 1rem;
-    outline: none;
-    transition: border-color 0.3s;
+.login-page__feature {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 0.9rem; border-radius: 10px;
+  background: rgba(255,255,255,0.12); color: #fff;
+  font-size: 0.88rem; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.15);
 }
 
-
-/* Focus state for input */
-
-input:focus {
-    border-color: #00796b;
+/* Right — form */
+.login-page__form-panel {
+  display: flex; align-items: center; justify-content: center;
+  padding: 3rem 4rem;
+  background: rgba(255,255,255,0.06);
 }
 
-
-/* Button style */
-
-.submit-button {
-    width: 100%;
-    padding: 12px;
-    background-color: #4e79a7;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
-    /* Adds gap between the input and the submit button */
+.login-page__card {
+  width: 100%; max-width: 380px;
+  border-radius: 20px; padding: 2rem 1.75rem;
+  background: rgba(255,255,255,0.97);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.12);
 }
 
+.login-page__card-header { text-align: center; margin-bottom: 1.5rem; }
 
-/* Button hover effect */
-
-.submit-button:hover {
-    background-color: #388e3c;
+.login-page__card-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-bottom: 0.6rem;
+  background: linear-gradient(135deg, #FF6B35, #FFD166);
 }
 
+.login-page__card-title {
+  font-family: 'Fredoka One', cursive; font-size: 1.6rem;
+  color: #2d3436; margin: 0 0 0.15rem;
+}
 
-/* Media Query for Responsive Design */
+.login-page__card-subtitle { color: #999; font-size: 0.82rem; margin: 0; }
 
-@media (max-width: 600px) {
-    .start-screen {
-        padding: 30px 20px;
-    }
-    h1 {
-        font-size: 1.8rem;
-    }
-    input,
-    .submit-button {
-        font-size: 1rem;
-        padding: 10px;
-    }
+/* Error */
+.login-page__error {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.6rem 0.8rem; border-radius: 10px; margin-bottom: 1rem;
+  font-size: 0.82rem; font-weight: 700;
+  background: #fff0f0; border: 1.5px solid #ffcccc; color: #cc0000;
+}
+
+/* Form */
+.login-page__form { display: flex; flex-direction: column; gap: 1rem; }
+.login-page__field { display: flex; flex-direction: column; gap: 0.3rem; }
+.login-page__label {
+  font-size: 0.75rem; font-weight: 800; color: #636e72;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.login-page__input-wrap { position: relative; }
+.login-page__input-icon {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: #b2bec3; pointer-events: none;
+}
+.login-page__input {
+  width: 100%; padding: 0.7rem 0.9rem 0.7rem 2.5rem;
+  border-radius: 12px; border: 2px solid #e0e0e0;
+  font-size: 0.9rem; font-weight: 600; color: #2d3436;
+  background: #fafafa; outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.login-page__input:focus {
+  border-color: #FF6B35; box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
+}
+
+/* Submit */
+.login-page__submit {
+  width: 100%; padding: 0.75rem; border-radius: 14px; border: none;
+  cursor: pointer; font-weight: 800; font-size: 1rem; color: #fff;
+  display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+  background: linear-gradient(135deg, #FF6B35, #FFD166);
+  box-shadow: 0 4px 16px rgba(255,107,53,0.35);
+  transition: transform 0.2s;
+}
+.login-page__submit:hover:not(:disabled) { transform: translateY(-2px); }
+.login-page__submit:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
+
+/* Register link */
+.login-page__register-link {
+  text-align: center; font-size: 0.82rem; color: #999; margin-top: 1rem;
+}
+.login-page__register-link a {
+  color: #FF6B35; font-weight: 800; text-decoration: none;
+}
+.login-page__register-link a:hover { text-decoration: underline; }
+
+/* Mobile: stack */
+@media (max-width: 768px) {
+  .login-page { grid-template-columns: 1fr; }
+  .login-page__branding { padding: 2rem 1.5rem 1rem; }
+  .login-page__branding-inner { text-align: center; }
+  .login-page__logo-icon { margin-left: auto; margin-right: auto; }
+  .login-page__brand-features { display: none; }
+  .login-page__form-panel { padding: 1rem 1.5rem 3rem; }
 }

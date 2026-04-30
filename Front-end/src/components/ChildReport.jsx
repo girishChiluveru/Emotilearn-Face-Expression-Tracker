@@ -1,221 +1,234 @@
-/* eslint-disable react/no-unknown-property */
 /* eslint-disable no-unused-vars */
-import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import axios from "axios";
-import "../styles/childreport.css";
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import axios from 'axios';
+import '../styles/childreport.css';
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from "recharts";
+  BarChart, Bar, LineChart, Line,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+} from 'recharts';
 
-// Color palette for charts
-const COLORS = [
-  "#FF6384",
-  "#36A2EB",
-  "#FFCE56",
-  "#4BC0C0",
-  "#9966FF",
-  "#FF9F40",
-];
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-// Emoji map for emotions
 const EMOJI_MAP = {
-  happy: "😊",
-  sad: "😢",
-  angry: "😠",
-  surprise: "😲",
-  fear: "😨",
-  neutral: "😐",
-  disgust: "🤢",
+  happy:   '😊',
+  sad:     '😢',
+  angry:   '😠',
+  fear:    '😨',
+  neutral: '😐',
+  disgust: '🤢',
 };
 
-// Base URL for images
-const BASE_URL = "http://localhost:3000/";
+const EMOTION_COLORS = {
+  happy:   '#FFCE56',
+  sad:     '#36A2EB',
+  angry:   '#FF6384',
+  fear:    '#9966FF',
+  neutral: '#C9CBCF',
+  disgust: '#4BC0C0',
+};
+
+const GAME_LABELS = { quiz: 'Quiz', animal: 'Animal Game', memory: 'Memory Game' };
+
+/**
+ * Build frequency chart data: { emotion, count } per game
+ */
+function buildFrequencyData(events, gameId) {
+  const filtered = gameId ? events.filter((e) => e.gameId === gameId) : events;
+  const counts = { happy: 0, sad: 0, angry: 0, fear: 0, neutral: 0, disgust: 0 };
+  filtered.forEach((ev) => {
+    const key = ev.dominant_emotion?.toLowerCase();
+    if (key in counts) counts[key]++;
+  });
+  return Object.entries(counts).map(([emotion, count]) => ({
+    emotion: `${EMOJI_MAP[emotion] ?? ''} ${emotion}`,
+    count,
+    fill: EMOTION_COLORS[emotion],
+  }));
+}
+
+/**
+ * Build time-series data: one point per event with dominant_score and timestamp
+ */
+function buildTimelineData(events, gameId) {
+  const filtered = (gameId ? events.filter((e) => e.gameId === gameId) : events)
+    .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+  return filtered.map((ev, idx) => ({
+    idx: idx + 1,
+    qid: ev.qid,
+    emotion: ev.dominant_emotion,
+    score: Number((ev.dominant_score * 100).toFixed(1)),
+  }));
+}
 
 const ChildResult = () => {
   const location = useLocation();
-  const { childName, sessionId } = location.state;
+  const { childName, sessionId } = location.state ?? {};
 
-  const [report, setReport] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedEmotion, setSelectedEmotion] = useState(null);
-  const [filteredImages, setFilteredImages] = useState([]);
+  const [session, setSession]     = useState(null);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState(null);
+  const [activeGame, setActiveGame] = useState(null); // filter by game
 
   useEffect(() => {
-    const fetchReport = async () => {
+    if (!childName || !sessionId) {
+      setError('Missing child name or session ID.');
+      setLoading(false);
+      return;
+    }
+
+    const fetchSession = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:3000/reports/${childName}/${sessionId}`
+        const res = await axios.get(
+          `${API_URL}/reports/${childName}/${sessionId}`,
+          { withCredentials: true }
         );
-        // Normalize image paths by replacing "\\" with "/" and prefixing the base URL
-        const normalizedImages = response.data.images.map((image) => ({
-          ...image,
-          imgpath: `${BASE_URL}${image.imgpath.replace(/\\/g, "/")}`,
-          screenshotpath: `${BASE_URL}${image.screenshotpath.replace(/\\/g, "/")}`,
-        }));
-        setReport({ ...response.data, images: normalizedImages });
-        setLoading(false);
+        setSession(res.data);
       } catch (err) {
-        console.error("Error fetching report:", err);
-        setError("Failed to load report data.");
+        console.error('Error fetching session:', err);
+        setError('Failed to load session data.');
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchReport();
+    fetchSession();
   }, [childName, sessionId]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <p>Loading…</p>;
+  if (error)   return <p style={{ color: 'red' }}>{error}</p>;
+  if (!session) return <p>No session data found.</p>;
 
-  // Extract game scores
-  const gameScores = report.scores.map((score) => ({
-    gameType: score.gameType,
-    score: score.score,
-  }));
+  const events    = session.emotion_events ?? [];
+  const scores    = session.scores ?? [];
+  const games     = [...new Set(events.map((e) => e.gameId))];
 
-  // Calculate emotion percentages
-  const emotionCounts = report.images.reduce((acc, image) => {
-    const dominantEmotion = image.max_emotion_img?.emotion;
-    if (dominantEmotion) {
-      acc[dominantEmotion] = (acc[dominantEmotion] || 0) + 1;
-    }
-    return acc;
-  }, {});
-
-  const emotionPercentages = Object.entries(emotionCounts).map(([emotion, count]) => ({
-    emotion: `${EMOJI_MAP[emotion] || "😶"} ${emotion}`,
-    percentage: ((count / report.images.length) * 100).toFixed(2),
-    rawEmotion: emotion,
-  }));
-
-  const handleEmotionClick = (emotion) => {
-    const filtered = report.images.filter(
-      (image) => image.max_emotion_img?.emotion === emotion
-    );
-    setSelectedEmotion(emotion);
-    setFilteredImages(filtered);
-  };
+  const freqData     = buildFrequencyData(events, activeGame);
+  const timelineData = buildTimelineData(events, activeGame);
 
   return (
     <div id="root" className="container">
-      
-      <div class="info">
-      <h1>Child Report</h1>
-      <p>
-        <strong>Child Name:</strong> {childName}
-      </p>
-      <p>
-        <strong>Session ID:</strong> {sessionId}
-      </p>
+      <div className="info">
+        <h1>Child Report</h1>
+        <p><strong>Child:</strong> {childName}</p>
+        <p><strong>Session:</strong> {sessionId}</p>
+        <p><strong>Total emotion samples:</strong> {events.length}</p>
       </div>
 
-      {selectedEmotion && (
-        <div className="sticky-emotion-bar">
-          <p>
-            Viewing analysis for emotion:{" "}
-            <strong>
-              {EMOJI_MAP[selectedEmotion]} {selectedEmotion}
-            </strong>
-          </p>
-          <button className="clear-selection" onClick={() => setSelectedEmotion(null)}>
-            Clear Selection
+      {/* ── Game filter tabs ───────────────────────────────────────── */}
+      <div style={{ display: 'flex', gap: '8px', margin: '16px 0' }}>
+        <button
+          className={`btn ${!activeGame ? 'success' : ''}`}
+          onClick={() => setActiveGame(null)}
+        >
+          All Games
+        </button>
+        {games.map((g) => (
+          <button
+            key={g}
+            className={`btn ${activeGame === g ? 'success' : ''}`}
+            onClick={() => setActiveGame(g)}
+          >
+            {GAME_LABELS[g] ?? g}
           </button>
-        </div>
-      )}
+        ))}
+      </div>
 
-      {/* Game Scores */}
+      {/* ── Game scores bar chart ──────────────────────────────────── */}
       <h2>Game Scores</h2>
-      <BarChart width={600} height={300} data={gameScores}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="gameType" angle={-45} textAnchor="end" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="score" fill="#8884d8" />
-      </BarChart>
-
-      {/* Dominant Emotions */}
-      <h2>Average Dominant Emotions</h2>
-      <BarChart
-        width={600}
-        height={300}
-        data={emotionPercentages}
-        onClick={(e) =>
-          handleEmotionClick(e?.activePayload?.[0]?.payload?.rawEmotion)
-        }
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="emotion"
-          tickFormatter={(tick) => tick.split(" ")[1]} // Remove emojis
-          angle={-45}
-          textAnchor="end"
-        />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="percentage" fill="#82ca9d" />
-      </BarChart>
-
-      {/* Individual Analysis for Selected Emotion */}
-      {selectedEmotion && (
-        <div>
-          <h3>
-            Images with Dominant Emotion: {EMOJI_MAP[selectedEmotion]} {selectedEmotion}
-          </h3>
-          {filteredImages.map((image, index) => {
-            const emotionData = Object.entries(image.emotions).map(([key, value]) => ({
-              name: `${EMOJI_MAP[key] || ""} ${key}`,
-              value: parseFloat(value.toFixed(2)), // Use percentages from the API
-            }));
-
-            return (
-              <div className="emotion-analysis-card" key={index}>
-                <img
-                  src={image.imgpath}
-                  alt={`Analysis for ${image.imgpath}`}
-                  className="image-preview"
-                />
-                <img
-                  src={image.screenshotpath}
-                  alt={`Analysis for ${image.screenshotpath}`}
-                  className="image-preview"
-                />
-                <div>
-                  
-                  <p>
-                    <strong>Dominant Emotion:</strong>{" "}
-                    {EMOJI_MAP[selectedEmotion]} {selectedEmotion}
-                  </p>
-
-                  {/* Bar Chart for Individual Image Analysis */}
-                  <BarChart width={400} height={300} data={emotionData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      dataKey="name"
-                      tickFormatter={(tick) => tick.split(" ")[1]} // Remove emojis
-                      angle={-45}
-                      textAnchor="end"
-                    />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="value" fill="#82ca9d" />
-                  </BarChart>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      {scores.length > 0 ? (
+        <ResponsiveContainer width="100%" height={260}>
+          <BarChart data={scores}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="gameType" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="score" fill="#8884d8" />
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <p>No scores recorded.</p>
       )}
+
+      {/* ── Emotion frequency bar chart ────────────────────────────── */}
+      <h2>Emotion Frequency {activeGame ? `— ${GAME_LABELS[activeGame]}` : '(All Games)'}</h2>
+      {events.length > 0 ? (
+        <ResponsiveContainer width="100%" height={280}>
+          <BarChart data={freqData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="emotion" tickFormatter={(t) => t.split(' ')[1]} />
+            <YAxis allowDecimals={false} />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="count" fill="#82ca9d" />
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <p>No emotion data for this selection.</p>
+      )}
+
+      {/* ── Emotion timeline line chart ────────────────────────────── */}
+      <h2>Emotion Confidence Over Time</h2>
+      {timelineData.length > 0 ? (
+        <ResponsiveContainer width="100%" height={280}>
+          <LineChart data={timelineData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="qid" label={{ value: 'Question/Round', position: 'insideBottom', offset: -4 }} />
+            <YAxis domain={[0, 100]} unit="%" />
+            <Tooltip
+              formatter={(val, name) => [`${val}%`, 'Confidence']}
+              labelFormatter={(label) => `Round: ${label}`}
+            />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="score"
+              stroke="#8884d8"
+              dot={{ r: 3 }}
+              activeDot={{ r: 6 }}
+              name="Dominant emotion confidence"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      ) : (
+        <p>No timeline data for this selection.</p>
+      )}
+
+      {/* ── Per-event detail table ─────────────────────────────────── */}
+      <h2>Emotion Event Log</h2>
+      <div className="table-container" style={{ overflowX: 'auto' }}>
+        <table className="table" style={{ fontSize: '0.8rem' }}>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Game</th>
+              <th>Q/Round</th>
+              <th>Dominant Emotion</th>
+              <th>Confidence</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {events
+              .filter((ev) => !activeGame || ev.gameId === activeGame)
+              .map((ev, idx) => (
+                <tr key={idx}>
+                  <td>{idx + 1}</td>
+                  <td>{GAME_LABELS[ev.gameId] ?? ev.gameId}</td>
+                  <td>{ev.qid}</td>
+                  <td>
+                    {EMOJI_MAP[ev.dominant_emotion?.toLowerCase()] ?? ''}{' '}
+                    {ev.dominant_emotion}
+                  </td>
+                  <td>{(ev.dominant_score * 100).toFixed(1)}%</td>
+                  <td>{ev.timestamp ? new Date(ev.timestamp).toLocaleTimeString() : '—'}</td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
