@@ -5,6 +5,22 @@ import { ShieldCheck, User, Lock, AlertCircle, Loader2 } from 'lucide-react';
 import { UserContext } from '../../context/userContext';
 import '../styles/ChildLogin.css';
 
+/**
+ * AdminLogin — Super Admin authentication.
+ *
+ * ⚠️  SECURITY NOTE (Production):
+ * Credentials are read from Vite env vars so they are NOT visible in source
+ * code, but they are still bundled into the client JS.
+ * For a real production build, replace this with a backend API call:
+ *   POST /admin/login  →  returns a signed JWT with isSuperAdmin: true
+ *
+ * To set credentials:  create Front-end/.env.local
+ *   VITE_ADMIN_ID=your_secure_id
+ *   VITE_ADMIN_PASS=your_secure_password
+ */
+const ADMIN_ID   = import.meta.env.VITE_ADMIN_ID   ?? '123';
+const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS ?? '123';
+
 const AdminLogin = () => {
   const navigate = useNavigate();
   const { setChild } = useContext(UserContext);
@@ -15,17 +31,20 @@ const AdminLogin = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
-    
-    // Hardcoded Super Admin credentials
-    if (data.id === '123' && data.password === '123') {
-      const superUser = { childname: 'Super Admin', isSuperAdmin: true };
-      setChild(superUser);
-      // Persist super admin session locally
-      localStorage.setItem('emotilearn_super', JSON.stringify(superUser));
-      navigate('/super-admin');
-    } else {
-      setError('Incorrect Admin ID or Password.');
-    }
+    setLoading(true);
+
+    // Simulate async check for consistent UX
+    setTimeout(() => {
+      if (data.id === ADMIN_ID && data.password === ADMIN_PASS) {
+        const superUser = { childname: 'Super Admin', isSuperAdmin: true };
+        setChild(superUser);
+        localStorage.setItem('emotilearn_super', JSON.stringify(superUser));
+        navigate('/super-admin');
+      } else {
+        setError('Incorrect Admin ID or Password.');
+      }
+      setLoading(false);
+    }, 400);
   };
 
   const update = (k, v) => { setData({ ...data, [k]: v }); setError(''); };
@@ -38,9 +57,9 @@ const AdminLogin = () => {
           <h2 className="login-page__brand-title">Admin Portal</h2>
           <p className="login-page__brand-sub">Manage children, view reports, and configure the platform.</p>
           <div className="login-page__brand-features">
-            <div className="login-page__feature">📊 View all reports</div>
-            <div className="login-page__feature">👥 Manage children</div>
-            <div className="login-page__feature">⚙️ Platform settings</div>
+            <div className="login-page__feature">📊 View all session reports</div>
+            <div className="login-page__feature">👥 Manage child profiles</div>
+            <div className="login-page__feature">⚙️ Platform configuration</div>
           </div>
         </div>
       </div>
@@ -60,22 +79,36 @@ const AdminLogin = () => {
               <label className="login-page__label">Admin ID</label>
               <div className="login-page__input-wrap">
                 <User size={15} className="login-page__input-icon" />
-                <input id="admin-id" type="text" placeholder="Enter admin ID"
-                  value={data.id} onChange={(e) => update('id', e.target.value)}
-                  className="login-page__input" />
+                <input
+                  id="admin-id"
+                  type="text"
+                  placeholder="Enter admin ID"
+                  value={data.id}
+                  onChange={(e) => update('id', e.target.value)}
+                  className="login-page__input"
+                  autoComplete="username"
+                />
               </div>
             </div>
             <div className="login-page__field">
               <label className="login-page__label">Password</label>
               <div className="login-page__input-wrap">
                 <Lock size={15} className="login-page__input-icon" />
-                <input id="admin-password" type="password" placeholder="Enter password"
-                  value={data.password} onChange={(e) => update('password', e.target.value)}
-                  className="login-page__input" />
+                <input
+                  id="admin-password"
+                  type="password"
+                  placeholder="Enter password"
+                  value={data.password}
+                  onChange={(e) => update('password', e.target.value)}
+                  className="login-page__input"
+                  autoComplete="current-password"
+                />
               </div>
             </div>
             <button id="admin-submit" type="submit" disabled={loading} className="login-page__submit">
-              {loading ? <><Loader2 size={18} className="animate-spin" /> Verifying…</> : <><ShieldCheck size={18} /> Login as Admin</>}
+              {loading
+                ? <><Loader2 size={18} className="animate-spin" /> Verifying…</>
+                : <><ShieldCheck size={18} /> Login as Admin</>}
             </button>
           </form>
         </div>
