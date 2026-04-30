@@ -1,24 +1,14 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useContext, useState, useEffect } from 'react';
+import { useContext } from 'react';
 import { UserContext } from '../../context/userContext';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { Home, LogIn, UserPlus, LogOut, Shield, HelpCircle, Menu, X } from 'lucide-react';
+import { Home, LogIn, UserPlus, LogOut, Shield, HelpCircle } from 'lucide-react';
 
 const Navbar = () => {
   const { child, setChild } = useContext(UserContext);
   const navigate = useNavigate();
   const location = useLocation();
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const handleLogout = async () => {
     try {
@@ -34,125 +24,63 @@ const Navbar = () => {
   };
 
   const isActive = (p) => location.pathname === p;
-  
-  // Tailwind common classes for links
-  const linkBaseClass = "flex items-center gap-2 text-sm font-bold uppercase tracking-wider transition-all duration-300 hover:scale-105";
-  const getLinkClass = (path) => `${linkBaseClass} ${isActive(path) ? 'text-red-400 italic' : 'text-gray-200 hover:text-yellow-400'}`;
+
+  const linkClass = (path) =>
+    `flex items-center gap-1.5 text-[14px] font-medium transition-colors hover:text-white ${
+      isActive(path) ? 'text-white' : 'text-slate-300'
+    }`;
 
   return (
-    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-      scrolled ? 'bg-slate-900/95 backdrop-blur-md shadow-lg py-3' : 'bg-slate-900/80 backdrop-blur-sm py-5'
-    }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-        
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-3 text-white hover:text-yellow-400 transition-colors group">
-          <div className="bg-white/10 p-2 rounded-full group-hover:bg-yellow-400/20 transition-colors">
-            <span className="text-xl">🧠</span>
-          </div>
-          <span className="text-2xl font-black tracking-widest uppercase">EmotiLearn</span>
+    <nav className="w-full flex items-center justify-between px-8 py-5 bg-[#0F1626]/80 backdrop-blur-md border-b border-white/5 sticky top-0 z-50">
+      <Link to="/" className="flex items-center gap-2 group">
+        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 group-hover:bg-orange-500/30 transition-colors">
+          <span className="text-xl">🧠</span>
+        </div>
+        <span className="text-[20px] font-semibold text-orange-400 tracking-wide">EmotiLearn</span>
+      </Link>
+
+      <div className="flex items-center gap-7">
+        <Link to="/" className={linkClass('/')}>
+          <Home size={16} /> Home
         </Link>
 
-        {/* Desktop Links */}
-        <div className="hidden md:flex items-center gap-8">
-          <Link to="/" className={getLinkClass('/')}>
-            <Home size={18} /> Home
-          </Link>
-          
-          {child ? (
-            <>
-              <Link to="/memory-game" className={getLinkClass('/memory-game')}>🧠 Memory</Link>
-              <Link to="/quiz" className={getLinkClass('/quiz')}>🧩 Quiz</Link>
-              <Link to="/animal-game" className={getLinkClass('/animal-game')}>🦁 Animal</Link>
-              <Link to="/report" className={getLinkClass('/report')}>📊 Reports</Link>
-              
-              {child.isSuperAdmin && (
-                <Link to="/super-admin" className={getLinkClass('/super-admin')}>
-                  <Shield size={18} /> Admin
-                </Link>
-              )}
-              
-              <button 
-                onClick={handleLogout} 
-                className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-bold text-sm uppercase tracking-wider transition-all duration-300 hover:scale-105 hover:shadow-lg shadow-red-500/30"
-              >
-                <LogOut size={18} /> Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className={getLinkClass('/login')}>
-                <LogIn size={18} /> Login
-              </Link>
-              <Link to="/admin-login" className={getLinkClass('/admin-login')}>
-                <Shield size={18} /> Admin
-              </Link>
-              <Link to="/register" className={getLinkClass('/register')}>
-                <UserPlus size={18} /> Register
-              </Link>
-              <Link to="/Faqs" className={getLinkClass('/Faqs')}>
-                <HelpCircle size={18} /> FAQ
-              </Link>
-            </>
-          )}
-        </div>
+        {child ? (
+          <>
+            <Link to="/memory-game" className={linkClass('/memory-game')}>🧠 Memory Game</Link>
+            <Link to="/quiz" className={linkClass('/quiz')}>🧩 Quiz Game</Link>
+            <Link to="/animal-game" className={linkClass('/animal-game')}>🦁 Animal Game</Link>
+            <Link to="/report" className={linkClass('/report')}>📊 Reports</Link>
 
-        {/* Mobile Menu Button */}
-        <div className="md:hidden">
-          <button 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="text-gray-200 hover:text-white p-2"
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
+            {child.isSuperAdmin && (
+              <Link to="/super-admin" className={linkClass('/super-admin')}>
+                <Shield size={16} /> Admin
+              </Link>
+            )}
+
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 px-4 py-2 text-[14px] font-medium text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors ml-2"
+            >
+              <LogOut size={16} /> Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" className={linkClass('/login')}>
+              <LogIn size={16} /> Login
+            </Link>
+            <Link to="/admin-login" className={linkClass('/admin-login')}>
+              <Shield size={16} /> Admin
+            </Link>
+            <Link to="/register" className={linkClass('/register')}>
+              <UserPlus size={16} /> Register
+            </Link>
+            <Link to="/Faqs" className={linkClass('/Faqs')}>
+              <HelpCircle size={16} /> FAQ
+            </Link>
+          </>
+        )}
       </div>
-
-      {/* Mobile Menu Dropdown */}
-      {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-slate-900/95 backdrop-blur-md shadow-xl border-t border-white/10 flex flex-col items-center py-6 gap-6">
-          <Link to="/" onClick={() => setMobileMenuOpen(false)} className={getLinkClass('/')}>
-            <Home size={18} /> Home
-          </Link>
-          
-          {child ? (
-            <>
-              <Link to="/memory-game" onClick={() => setMobileMenuOpen(false)} className={getLinkClass('/memory-game')}>🧠 Memory Game</Link>
-              <Link to="/quiz" onClick={() => setMobileMenuOpen(false)} className={getLinkClass('/quiz')}>🧩 Quiz Game</Link>
-              <Link to="/animal-game" onClick={() => setMobileMenuOpen(false)} className={getLinkClass('/animal-game')}>🦁 Animal Game</Link>
-              <Link to="/report" onClick={() => setMobileMenuOpen(false)} className={getLinkClass('/report')}>📊 Reports</Link>
-              
-              {child.isSuperAdmin && (
-                <Link to="/super-admin" onClick={() => setMobileMenuOpen(false)} className={getLinkClass('/super-admin')}>
-                  <Shield size={18} /> Admin
-                </Link>
-              )}
-              
-              <button 
-                onClick={() => { handleLogout(); setMobileMenuOpen(false); }} 
-                className="flex items-center gap-2 px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-bold mt-4"
-              >
-                <LogOut size={18} /> Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" onClick={() => setMobileMenuOpen(false)} className={getLinkClass('/login')}>
-                <LogIn size={18} /> Login
-              </Link>
-              <Link to="/admin-login" onClick={() => setMobileMenuOpen(false)} className={getLinkClass('/admin-login')}>
-                <Shield size={18} /> Admin
-              </Link>
-              <Link to="/register" onClick={() => setMobileMenuOpen(false)} className={getLinkClass('/register')}>
-                <UserPlus size={18} /> Register
-              </Link>
-              <Link to="/Faqs" onClick={() => setMobileMenuOpen(false)} className={getLinkClass('/Faqs')}>
-                <HelpCircle size={18} /> FAQ
-              </Link>
-            </>
-          )}
-        </div>
-      )}
     </nav>
   );
 };
