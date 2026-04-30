@@ -1,0 +1,24 @@
+# ── Core ML ───────────────────────────────────────────────────────────────────
+torch>=2.0.0
+torchvision>=0.15.0
+
+# ── FastAPI server ────────────────────────────────────────────────────────────
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0          # async ASGI server with websockets + httptools
+python-multipart>=0.0.9            # required by FastAPI for form/file uploads
+
+# ── Validation & config ───────────────────────────────────────────────────────
+pydantic>=2.7.0
+pydantic-settings>=2.2.0           # BaseSettings for env-var config
+
+# ── Rate limiting ─────────────────────────────────────────────────────────────
+slowapi>=0.1.9                     # starlette-compatible rate limiter
+
+# ── Data processing ───────────────────────────────────────────────────────────
+numpy>=1.26.0
+pandas>=2.2.0
+scikit-learn>=1.4.0
+openpyxl>=3.1.0                    # required by pandas to read .xlsx files
+
+# ── Environment ───────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0               # loads .env files (used by pydantic-settings too)

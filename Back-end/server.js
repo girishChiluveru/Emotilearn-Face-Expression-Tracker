@@ -1,164 +1,429 @@
-// server.js
+// server.js — Emotilearn Node.js backend
+// Real-time emotion detection via Socket.io + FastAPI TransformerModel
+// Enhanced with JWT, CSRF, ETag, Idempotency, and comprehensive error handling
+
+const http = require('http');
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const bodyParser = require('body-parser');
 const cors = require('cors');
-const { connectToMongoDB } = require('./connection');
-const resultRoutes = require('./routes/result');
-const photoRoutes = require('./routes/photos');
-const reportRoutes = require('./routes/report1');
-const processRoutes = require('./routes/process');
-const analyzeRoutes = require('./routes/analyze');
-const emotionRoutes = require('./routes/storeEmotions');
-const storeScoresRoutes = require('./routes/storeScores');
-const dotenv = require('dotenv').config();
 const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const path = require('path');
+require('dotenv').config();
 
+// ── Core dependencies ─────────────────────────────────────────────────────────
+const { connectToMongoDB } = require('./connection');
+const { registerEmotionSocket } = require('./controllers/emotionSocket');
 
+// ── Route imports ─────────────────────────────────────────────────────────────
+const authRoutes = require('./routes/authRoutes');
+const reportRoutes = require('./routes/report1');
+const storeScoresRoutes = require('./routes/storeScores');
+
+// ── Models ────────────────────────────────────────────────────────────────────
+const Admin = require('./models/admin');
+const Report = require('./models/report');
+
+// ── Security Middleware ───────────────────────────────────────────────────────
+const {
+  csrfTokenMiddleware,
+  csrfVerifyMiddleware,
+  getCsrfTokenRoute,
+} = require('./middleware/csrfProtection');
+const {
+  authMiddleware,
+  optionalAuthMiddleware,
+  adminOnlyMiddleware,
+} = require('./middleware/authMiddleware');
+const {
+  etagMiddleware,
+  cacheMiddleware,
+  invalidateCacheMiddleware,
+} = require('./middleware/etagMiddleware');
+const {
+  idempotencyMiddleware,
+  requireIdempotencyKey,
+} = require('./middleware/idempotencyMiddleware');
+const {
+  validateRequest,
+  registerChildSchema,
+  loginChildSchema,
+  adminLoginSchema,
+  storeScoresSchema,
+} = require('./middleware/requestValidation');
+const { errorHandler, notFoundHandler, asyncHandler } = require('./middleware/errorHandler');
+
+// ── App + HTTP server ─────────────────────────────────────────────────────────
 const app = express();
+const server = http.createServer(app);
+
 const PORT = process.env.PORT || 3000;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-app.use(cookieParser());
-
-app.use('/photos', express.static(path.join(__dirname, 'photos')));
-// mongodb://127.0.0.1:27017/results
-connectToMongoDB(process.env.CONNECTION_STRING)
-    .then(() => console.log("MongoDB connected"))
-    .catch((err) => console.error("MongoDB connection error:", err));
-
-
-app.use(cors({
+// ── Socket.io ─────────────────────────────────────────────────────────────────
+const { Server } = require('socket.io');
+const io = new Server(server, {
+  cors: {
+    origin: process.env.SOCKET_CORS_ORIGIN || FRONTEND_URL,
+    methods: ['GET', 'POST'],
     credentials: true,
-    origin: [FRONTEND_URL] // Frontend origin
+  },
+  transports: ['websocket', 'polling'],
+});
+registerEmotionSocket(io);
+
+// ── MongoDB ───────────────────────────────────────────────────────────────────
+connectToMongoDB(process.env.CONNECTION_STRING)
+  .then(() => console.log('✅ MongoDB connected'))
+  .catch((err) => console.error('❌ MongoDB connection error:', err));
+
+// ── Security Headers ─────────────────────────────────────────────────────────
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+      },
+    },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+  }),
+);
+
+// ── CORS Configuration ────────────────────────────────────────────────────────
+app.use(
+  cors({
+    origin: FRONTEND_URL.split(',').map((url) => url.trim()),
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-CSRF-Token',
+      'Idempotency-Key',
+    ],
+  }),
+);
+
+// ── Body Parser Middleware ────────────────────────────────────────────────────
+app.use(cookieParser());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// ── Rate Limiting ────────────────────────────────────────────────────────────
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5, // 5 attempts
+  message: 'Too many login attempts, please try again after 15 minutes',
+  skipSuccessfulRequests: true,
+  keyGenerator: (req) => req.body?.childname || req.ip,
+});
+
+app.use(generalLimiter);
+
+// ── CSRF Protection ──────────────────────────────────────────────────────────
+app.use(csrfTokenMiddleware);
+
+// ── Optional Auth for Caching ────────────────────────────────────────────────
+app.use(optionalAuthMiddleware);
+
+// ── Middleware (order matters!) ───────────────────────────────────────────────
+app.use(etagMiddleware);
+app.use(idempotencyMiddleware);
+
+// ── Health Checks ────────────────────────────────────────────────────────────
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date(),
+    uptime: process.uptime(),
+  });
+});
+
+app.get('/health/db', asyncHandler(async (req, res) => {
+  const mongoStatus = await Report.findOne({}).lean();
+  res.json({
+    status: 'ok',
+    database: 'connected',
+    collections: 'accessible',
+  });
 }));
 
+app.get('/health/ai', asyncHandler(async (req, res) => {
+  // Check AI service health
+  const fetch = (await import('node-fetch')).default;
+  try {
+    const response = await fetch(`${process.env.AI_SERVICE_URL}/health`, {
+      timeout: 5000,
+    });
+    const data = await response.json();
+    res.json({ status: 'ok', aiService: data });
+  } catch (err) {
+    res.status(503).json({ error: 'AI service unavailable' });
+  }
+}));
 
-// Middleware setup
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.json({ limit: '10mb' }));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/results', resultRoutes);
-app.use('/photos', photoRoutes);
-app.use('/reports', reportRoutes);
-app.use('/process', processRoutes);
-app.use('/analyze', analyzeRoutes);
-app.use('/store-emotions', emotionRoutes);
-app.use('/store-scores', storeScoresRoutes);
-app.use('/', require('./routes/authRoutes'));
+// ── CSRF Token Endpoint ───────────────────────────────────────────────────────
+app.get('/csrf-token', getCsrfTokenRoute);
 
+// ── Public Routes (no auth required) ──────────────────────────────────────────
+app.post(
+  '/register',
+  authLimiter,
+  validateRequest(registerChildSchema, 'body'),
+  csrfVerifyMiddleware,
+  require('./routes/authRoutes').registerChild,
+);
 
-const Admin = require('./models/Admin');
-const Report = require('./models/report');
+app.post(
+  '/login',
+  authLimiter,
+  validateRequest(loginChildSchema, 'body'),
+  csrfVerifyMiddleware,
+  require('./routes/authRoutes').loginChild,
+);
 
-app.use(express.json()); // Parse JSON payloads
-app.use(express.urlencoded({ extended: true }));
-app.get('/children', async(req, res) => {
-    try {
-        const children = await Report.find();
-        res.json(children);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+app.post(
+  '/admin/login',
+  authLimiter,
+  validateRequest(adminLoginSchema, 'body'),
+  csrfVerifyMiddleware,
+  require('./routes/authRoutes').adminLogin,
+);
+
+// ── Protected Routes ──────────────────────────────────────────────────────────
+app.get('/profile', authMiddleware, require('./routes/authRoutes').getProfile);
+
+app.post(
+  '/logout',
+  authMiddleware,
+  csrfVerifyMiddleware,
+  require('./routes/authRoutes').logoutChild,
+);
+
+// ── Reports Routes ───────────────────────────────────────────────────────────
+app.get('/reports/children', authMiddleware, adminOnlyMiddleware, 
+  cacheMiddleware(300), // Cache for 5 minutes
+  asyncHandler(async (req, res) => {
+    const children = await Report.find(
+      {},
+      'childname sessions.sessionId sessions.sessiondate sessions.isProcessed sessions.scores',
+    );
+    res.json(children);
+  }),
+);
+
+app.get('/reports/report/:childname', authMiddleware, 
+  cacheMiddleware(600), // Cache for 10 minutes
+  asyncHandler(async (req, res) => {
+    const { childname } = req.params;
+    const report = await Report.findOne({ childname });
+    if (!report) {
+      return res.status(404).json({ error: 'Report not found' });
     }
-});
+    res.json(report);
+  }),
+);
 
-// 2. Create a new child
-app.post('/children', async(req, res) => {
-    try {
-        const newChild = new Report(req.body);
-        await newChild.save();
-        res.status(201).json(newChild);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
+// ── Store Scores ──────────────────────────────────────────────────────────────
+app.post(
+  '/store-scores',
+  authMiddleware,
+  validateRequest(storeScoresSchema, 'body'),
+  idempotencyMiddleware,
+  invalidateCacheMiddleware,
+  csrfVerifyMiddleware,
+  asyncHandler(async (req, res) => {
+    const { sessionId, gameType, score, duration } = req.body;
+
+    const report = await Report.findOne({ 'sessions.sessionId': sessionId });
+    if (!report) {
+      return res.status(404).json({ error: 'Session not found' });
     }
+
+    const session = report.sessions.id(sessionId);
+    session.scores.push({ gameType, score });
+
+    await report.save();
+    res.json({
+      message: 'Score stored successfully',
+      score: { gameType, score },
+    });
+  }),
+);
+
+// ── Children Management (Admin only) ──────────────────────────────────────────
+app.get(
+  '/children',
+  authMiddleware,
+  adminOnlyMiddleware,
+  cacheMiddleware(300),
+  asyncHandler(async (req, res) => {
+    const children = await Report.find(
+      {},
+      'childname sessions.sessionId sessions.sessiondate sessions.isProcessed sessions.scores',
+    );
+    res.json(children);
+  }),
+);
+
+app.post(
+  '/children',
+  authMiddleware,
+  adminOnlyMiddleware,
+  csrfVerifyMiddleware,
+  invalidateCacheMiddleware,
+  requireIdempotencyKey,
+  idempotencyMiddleware,
+  asyncHandler(async (req, res) => {
+    const newChild = new Report(req.body);
+    await newChild.save();
+    res.status(201).json(newChild);
+  }),
+);
+
+app.put(
+  '/children/:id',
+  authMiddleware,
+  adminOnlyMiddleware,
+  csrfVerifyMiddleware,
+  invalidateCacheMiddleware,
+  asyncHandler(async (req, res) => {
+    const updated = await Report.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    res.json(updated);
+  }),
+);
+
+app.delete(
+  '/children/:id',
+  authMiddleware,
+  adminOnlyMiddleware,
+  csrfVerifyMiddleware,
+  invalidateCacheMiddleware,
+  asyncHandler(async (req, res) => {
+    await Report.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Child deleted successfully' });
+  }),
+);
+
+// ── Session Management ────────────────────────────────────────────────────────
+app.patch(
+  '/sessions/:childId/:sessionId',
+  authMiddleware,
+  adminOnlyMiddleware,
+  csrfVerifyMiddleware,
+  invalidateCacheMiddleware,
+  asyncHandler(async (req, res) => {
+    const { childId, sessionId } = req.params;
+    const { isProcessed } = req.body;
+
+    const child = await Report.findById(childId);
+    if (!child) return res.status(404).json({ message: 'Child not found' });
+
+    const session = child.sessions.id(sessionId);
+    if (!session) return res.status(404).json({ message: 'Session not found' });
+
+    session.isProcessed = isProcessed;
+    await child.save();
+
+    res.json(child);
+  }),
+);
+
+// ── Admin Management ──────────────────────────────────────────────────────────
+app.get(
+  '/admins',
+  authMiddleware,
+  adminOnlyMiddleware,
+  cacheMiddleware(300),
+  asyncHandler(async (req, res) => {
+    const admins = await Admin.find({}, '-password');
+    res.json(admins);
+  }),
+);
+
+app.post(
+  '/admins',
+  authMiddleware,
+  adminOnlyMiddleware,
+  csrfVerifyMiddleware,
+  invalidateCacheMiddleware,
+  requireIdempotencyKey,
+  idempotencyMiddleware,
+  asyncHandler(async (req, res) => {
+    const newAdmin = new Admin(req.body);
+    await newAdmin.save();
+    res.status(201).json({
+      message: 'Admin created successfully',
+      admin: newAdmin.name,
+    });
+  }),
+);
+
+app.delete(
+  '/admins/:id',
+  authMiddleware,
+  adminOnlyMiddleware,
+  csrfVerifyMiddleware,
+  invalidateCacheMiddleware,
+  asyncHandler(async (req, res) => {
+    await Admin.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Admin deleted successfully' });
+  }),
+);
+
+// ── Static Files ──────────────────────────────────────────────────────────────
+app.use('/photos', express.static(path.join(__dirname, 'photos')));
+
+// ── 404 Handler ───────────────────────────────────────────────────────────────
+app.use(notFoundHandler);
+
+// ── Error Handler (must be last) ──────────────────────────────────────────────
+app.use(errorHandler);
+
+// ── Start Server ──────────────────────────────────────────────────────────────
+server.listen(PORT, () => {
+  console.log(`
+    🚀 Emotilearn Backend Started
+    ├─ HTTP: http://localhost:${PORT}
+    ├─ WebSocket: ws://localhost:${PORT}
+    ├─ Environment: ${process.env.NODE_ENV || 'development'}
+    ├─ Database: ${process.env.CONNECTION_STRING?.split('@')[1] || 'MongoDB'}
+    ├─ Security Features:
+    │  ├─ JWT Authentication ✅
+    │  ├─ CSRF Protection ✅
+    │  ├─ ETag Caching ✅
+    │  ├─ Idempotency ✅
+    │  ├─ Rate Limiting ✅
+    │  └─ Request Validation ✅
+    └─ Health: http://localhost:${PORT}/health
+  `);
 });
 
-// 3. Update child details
-app.put('/children/:id', async(req, res) => {
-    try {
-        const updatedChild = await Report.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        res.json(updatedChild);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
+// ── Graceful Shutdown ─────────────────────────────────────────────────────────
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received: closing HTTP server');
+  server.close(() => {
+    console.log('HTTP server closed');
+    process.exit(0);
+  });
 });
 
-// 4. Delete a child
-app.delete('/children/:id', async(req, res) => {
-    try {
-        await Report.findByIdAndDelete(req.params.id);
-        res.json({ message: "Child deleted successfully" });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+module.exports = { app, server, io };
 
-// 5. Update session's isProcessed
-app.patch('/sessions/:childId/:sessionId', async(req, res) => {
-    try {
-        const { childId, sessionId } = req.params;
-        const { isProcessed } = req.body;
-
-        const child = await Report.findById(childId);
-        const session = child.sessions.id(sessionId);
-        if (session) {
-            session.isProcessed = isProcessed;
-            await child.save();
-            res.json(child);
-        } else {
-            res.status(404).json({ message: "Session not found" });
-        }
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
-});
-
-
-
-// Get all admins
-app.get('/admins', async(req, res) => {
-    try {
-        const admins = await Admin.find();
-        res.json(admins);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Create a new admin
-app.post('/admins', async(req, res) => {
-    try {
-        const newAdmin = new Admin(req.body);
-        await newAdmin.save();
-        res.status(201).json(newAdmin);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
-});
-
-// Update an admin
-app.put('/admins/:id', async(req, res) => {
-    try {
-        const updatedAdmin = await Admin.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        res.json(updatedAdmin);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
-});
-
-// Delete an admin
-app.delete('/admins/:id', async(req, res) => {
-    try {
-        await Admin.findByIdAndDelete(req.params.id);
-        res.json({ message: "Admin deleted successfully" });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-
-app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
-
-});

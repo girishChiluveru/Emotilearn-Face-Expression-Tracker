@@ -1,142 +1,124 @@
-/* eslint-disable no-unused-vars */
-import { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Navbar from './Navbar'; // Navbar component
-import Quiz from './Quiz'; // Quiz game
-import AnimalGame from './AnimalGame'; // Animal game
-import MemoryGame from './MemoryGame'; // Memory game
-import Report from './Report'; // Admin report
-import ChildReport from './ChildReport'; // Child report
-import ChildLogin from './ChildLogin'; // Child login
-import AdminLogin from './AdminLogin'; // Admin login
-import LandingPage from './LandingPage'; // Landing page
-import 'bootstrap/dist/css/bootstrap.min.css';
-import '../styles/App.css';
+import { useState, useContext } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { UserContext } from '../../context/userContext';
+import Navbar from './Navbar';
+import Quiz from './Quiz';
+import AnimalGame from './AnimalGame';
+import MemoryGame from './MemoryGame';
+import Report from './Report';
+import ChildReport from './ChildReport';
+import ChildLogin from './ChildLogin';
+import AdminLogin from './AdminLogin';
+import LandingPage from './LandingPage';
+import GameSelect from './GameSelect';
 import ChildRegister from './Register';
-import { Toaster } from 'react-hot-toast';
-import axios from 'axios';
 import SuperAdmin from './SuperAdmin';
 import Faqs from './Faqs';
-axios.defaults.baseURL = 'http://localhost:3000';
+import { Toaster } from 'react-hot-toast';
+import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '../styles/App.css';
+
+// Central axios configuration — only set here, not in userContext
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+axios.defaults.baseURL = API_URL;
 axios.defaults.withCredentials = true;
 
+/** Redirect already-logged-in users away from auth pages */
+const PublicRoute = ({ children }) => {
+  const { child, ready } = useContext(UserContext);
+  if (!ready) return null;
+  return child ? <Navigate to="/game-select" replace /> : children;
+};
 
+/** Require any authenticated session */
+const ProtectedRoute = ({ children }) => {
+  const { child, ready } = useContext(UserContext);
+  if (!ready) return null;
+  return child ? children : <Navigate to="/login" replace />;
+};
+
+/** Require super-admin session — children & unauthenticated users are redirected */
+const AdminRoute = ({ children }) => {
+  const { child, ready } = useContext(UserContext);
+  if (!ready) return null;
+  if (!child) return <Navigate to="/login" replace />;
+  if (!child.isSuperAdmin) return <Navigate to="/game-select" replace />;
+  return children;
+};
 
 function App() {
-  // States for managing application data
-  const [gameStage, setGameStage] = useState('start'); // Game stage
-  const [isAdmin, setIsAdmin] = useState(false); // Admin login status
-  const [childName, setChildName] = useState(''); // Child's name
-  const [sessionId, setSessionId] = useState(''); // Current session ID
-  const [allSessions, setAllSessions] = useState([]); // All session data
+  const [childname, setChildname] = useState('');
+  const [sessionId, setSessionId] = useState(
+    () => localStorage.getItem('emotilearn_sid') || ''
+  );
+  const { child } = useContext(UserContext);
 
-  // Handlers for login and game transitions
-  const handleAdminLogin = () => setIsAdmin(true);
-
-  const handleStartQuiz = (name, sid) => {
-    setChildName(name);
-    setSessionId(sid);
-    setGameStage('quiz');
+  const resolved = {
+    name: childname || child?.childname || '',
+    session: sessionId,
   };
 
-  const handleAddSession = (sessionData) =>
-    setAllSessions((prev) => [...prev, sessionData]);
+  const handleStartQuiz = (name, sid) => {
+    setChildname(name);
+    setSessionId(sid);
+    localStorage.setItem('emotilearn_sid', sid);
+  };
 
-  // Function to post scores to the server
   const postScores = async (scores) => {
+    if (!resolved.name || !resolved.session) return;
     try {
-      const response = await fetch('http://localhost:3000/store-scores', {
+      const r = await fetch(`${API_URL}/store-scores`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
-          childName,
-          sessionId,
-          scores, // Scores should be an array of objects with gameType and score
+          childName: resolved.name,
+          sessionId: resolved.session,
+          scores,
         }),
       });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      console.log('Scores stored successfully:', data);
-    } catch (error) {
-      console.error('Failed to store scores:', error);
+      if (!r.ok) throw new Error(r.statusText);
+    } catch (e) {
+      console.error('postScores failed:', e);
     }
   };
 
-  // Render functions for each game
-  const renderQuiz = () => (
-    <Quiz
-      onQuizEnd={(score, expressionTally) => {
-        handleAddSession({ childName, sessionId, quizScore: score, expressionTally });
-        postScores([{ gameType: 'Quiz Game', score }]);
-        setGameStage('AnimalGame');
-      }}
-      childName={childName}
-      sessionId={sessionId}
-    />
-  );
-
-  const renderAnimalGame = () => (
-    <AnimalGame
-      onanimal={(score) => {
-        setAllSessions((prev) =>
-          prev.map((session) =>
-            session.sessionId === sessionId ? { ...session, animalGameScore: score } : session
-          )
-        );
-        postScores([{ gameType: 'Animal Game', score }]);
-        setGameStage('memoryGame');
-      }}
-      childName={childName}
-      sessionId={sessionId}
-    />
-  );
-
-  const renderMemoryGame = () => (
-    <MemoryGame
-      onFinish={(score) => {
-        setAllSessions((prev) =>
-          prev.map((session) =>
-            session.sessionId === sessionId ? { ...session, memoryGameScore: score } : session
-          )
-        );
-        postScores([{ gameType: 'Memory Game', score }]);
-        setGameStage('start');
-      }}
-      childName={childName}
-      sessionId={sessionId}
-    />
-  );
+  const withNav = (C) => <><Navbar />{C}</>;
 
   return (
     <Router>
-      <div className="app">
-        {/* Conditionally render Navbar */}
-        {gameStage === 'start' && <Navbar />} {/* Navbar is visible only when gameStage is 'start' */}
-        <Toaster position="center" toastOptions={{ duration: 3000 }} />
-        
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/child-login" element={<ChildLogin onStartQuiz={handleStartQuiz} />} />
-          <Route path="/admin-login" element={<AdminLogin onAdminLogin={handleAdminLogin} />} />
-          <Route path="/child-report" element={<ChildReport />} />
-          <Route path="/quiz" element={renderQuiz()} />
-          <Route path="/animal-game" element={renderAnimalGame()} />
-          <Route path="/memory-game" element={renderMemoryGame()} />
-          <Route path="/report" element={<Report allSessions={allSessions} />} />
-          <Route path="/child-register" element={<ChildRegister onStartQuiz={handleStartQuiz} />} />
-          <Route path="/super-admin" element={<SuperAdmin/>} />
-          <Route path="/Faqs" element={<Faqs/>} />
-        </Routes>
-      </div>
+      <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Auth — public only */}
+        <Route path="/login"       element={<PublicRoute><ChildLogin onStartQuiz={handleStartQuiz} /></PublicRoute>} />
+        <Route path="/admin-login" element={<PublicRoute><AdminLogin /></PublicRoute>} />
+        <Route path="/register"    element={<PublicRoute><ChildRegister /></PublicRoute>} />
+
+        {/* Game hub — any authenticated user */}
+        <Route path="/game-select" element={<ProtectedRoute>{withNav(<GameSelect childname={resolved.name} />)}</ProtectedRoute>} />
+
+        {/* Games — no navbar (full-screen experience) */}
+        <Route path="/quiz"        element={<ProtectedRoute><Quiz        childname={resolved.name} sessionId={resolved.session} onQuizEnd={(s)   => postScores([{ gameType: 'Quiz Game',   score: s }])} /></ProtectedRoute>} />
+        <Route path="/animal-game" element={<ProtectedRoute><AnimalGame  childname={resolved.name} sessionId={resolved.session} onanimal={(s)    => postScores([{ gameType: 'Animal Game', score: s }])} /></ProtectedRoute>} />
+        <Route path="/memory-game" element={<ProtectedRoute><MemoryGame  childname={resolved.name} sessionId={resolved.session} onFinish={(s)   => postScores([{ gameType: 'Memory Game', score: s }])} /></ProtectedRoute>} />
+
+        {/* Reports & Admin — super-admin only */}
+        <Route path="/report"       element={<AdminRoute>{withNav(<Report />)}</AdminRoute>} />
+        <Route path="/child-report" element={<AdminRoute>{withNav(<ChildReport />)}</AdminRoute>} />
+        <Route path="/super-admin"  element={<AdminRoute>{withNav(<SuperAdmin />)}</AdminRoute>} />
+
+        {/* Public pages */}
+        <Route path="/Faqs" element={<Faqs />} />
+
+        {/* Legacy redirects */}
+        <Route path="/child-login"    element={<Navigate to="/login"    replace />} />
+        <Route path="/child-register" element={<Navigate to="/register" replace />} />
+      </Routes>
     </Router>
   );
-  
 }
 
 export default App;

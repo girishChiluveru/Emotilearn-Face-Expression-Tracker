@@ -1,76 +1,101 @@
 /* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
-import  { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { useNavigate } from 'react-router-dom';
-import "../styles/ChildLogin.css";
+import { useState, useContext } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { UserContext } from '../../context/userContext';
+import { LogIn, User, Lock, AlertCircle, Loader2, Sparkles } from 'lucide-react';
+import '../styles/ChildLogin.css';
 
 const ChildLogin = ({ onStartQuiz }) => {
   const navigate = useNavigate();
-  const [data, setData] = useState({ 
-    childname: '',
-    password: '',
-});
+  const { setChild } = useContext(UserContext);
+  const [data, setData] = useState({ childname: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-const loginChild = async (e) => {
-  e.preventDefault();
-  console.log(data);
-  const { childname, password } = data;
-  if (childname.trim() !== '') {
+  const loginChild = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (!data.childname.trim()) { setError('Please enter your name.'); return; }
+
+    setLoading(true);
     try {
-      const response = await axios.post('/login', { childname, password });
-      const { error, sessionId, isAdmin } = response.data;
-
-      if (error) {
-        toast.error(error);
-      } else {
+      const res = await axios.post('/login', data);
+      if (res.data.error) { setError(res.data.error); }
+      else {
+        setChild(res.data);
+        if (res.data.isAdmin) navigate('/report');
+        else { onStartQuiz(data.childname, res.data.sessionId); navigate('/game-select'); }
         setData({ childname: '', password: '' });
-        console.log('Session started successfully:', sessionId);
-
-        if (isAdmin) {
-          console.log("He is admin");
-          navigate('/report'); // Redirect to reports page
-        } else {
-          onStartQuiz(childname, sessionId);
-          navigate('/quiz'); // Redirect to quiz page
-        }
       }
-    } catch (error) {
-      console.error(error);
-      toast.error('An error occurred while logging in.');
-    }
-  }
-};
+    } catch (err) {
+      setError(err.response?.data?.error || 'Something went wrong.');
+    } finally { setLoading(false); }
+  };
 
+  const update = (k, v) => { setData({ ...data, [k]: v }); setError(''); };
 
   return (
-    <div className="start-screen">
-      <h1>Login</h1>
-      <form onSubmit={loginChild}>
-        <label htmlFor="childName">Enter name:</label>
-        <input
-          type="text"
-          placeholder="Enter name"
-          value={data.childname} 
-          onChange={(e) => setData({ ...data, childname: e.target.value })} 
-        />
-        <label>Password</label>
-          <input
-            type="password"
-            placeholder="Enter password"
-            value={data.password} 
-            onChange={(e) => setData({ ...data, password: e.target.value })} 
-          />
-        <br />
-        <button type="submit" className="submit-button">Submit</button>
-      </form>
+    <div className="login-page">
+      {/* Left — branding */}
+      <div className="login-page__branding">
+        <div className="login-page__branding-inner">
+          <div className="login-page__logo-icon"><Sparkles size={28} color="white" /></div>
+          <h2 className="login-page__brand-title">EmotiLearn</h2>
+          <p className="login-page__brand-sub">
+            Track emotions while playing fun games — designed for curious minds! 🌈
+          </p>
+          <div className="login-page__brand-features">
+            <div className="login-page__feature">🎮 Fun interactive games</div>
+            <div className="login-page__feature">🧠 Real-time emotion tracking</div>
+            <div className="login-page__feature">📊 Detailed progress reports</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right — form */}
+      <div className="login-page__form-panel">
+        <div className="login-page__card">
+          <div className="login-page__card-header">
+            <div className="login-page__card-icon"><LogIn size={22} color="white" /></div>
+            <h1 className="login-page__card-title">Welcome Back!</h1>
+            <p className="login-page__card-subtitle">Sign in to start playing 🎮</p>
+          </div>
+
+          {error && <div className="login-page__error"><AlertCircle size={15} /> {error}</div>}
+
+          <form onSubmit={loginChild} className="login-page__form">
+            <div className="login-page__field">
+              <label className="login-page__label">Your Name</label>
+              <div className="login-page__input-wrap">
+                <User size={15} className="login-page__input-icon" />
+                <input id="login-name" type="text" placeholder="Enter your name"
+                  value={data.childname} onChange={(e) => update('childname', e.target.value)}
+                  className="login-page__input" />
+              </div>
+            </div>
+            <div className="login-page__field">
+              <label className="login-page__label">Password</label>
+              <div className="login-page__input-wrap">
+                <Lock size={15} className="login-page__input-icon" />
+                <input id="login-password" type="password" placeholder="Enter password"
+                  value={data.password} onChange={(e) => update('password', e.target.value)}
+                  className="login-page__input" />
+              </div>
+            </div>
+            <button id="login-submit" type="submit" disabled={loading} className="login-page__submit">
+              {loading ? <><Loader2 size={18} className="animate-spin" /> Logging in…</> : <><LogIn size={18} /> Let's Play! 🚀</>}
+            </button>
+          </form>
+
+          <p className="login-page__register-link">
+            New here? <Link to="/register">Register now →</Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
 
 export default ChildLogin;
-
-
-

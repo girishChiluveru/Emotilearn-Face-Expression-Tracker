@@ -1,74 +1,68 @@
-const reports = require('../models/report');
-// Controller to handle fetching reports
+const Report = require('../models/report');
+
+/**
+ * GET /reports
+ * Returns all children with their sessions and emotion_events for charts.
+ */
 async function handleReport(req, res) {
     try {
-        // Fetch all reports and include necessary nested fields
-        const report = await reports.find({}, 'childname sessions.sessionId sessions.isProcessed sessions.images.imgpath sessions.images.screenshotpath sessions.images.emotions sessions.images.max_emotion_img sessions.scores');
+        const reports = await Report.find(
+            {},
+            'childname sessions.sessionId sessions.sessiondate sessions.isProcessed sessions.emotion_events sessions.scores'
+        ).lean();
 
-        // If no reports found, return a 404 response
-        if (!report || report.length === 0) {
-            return res.status(404).json({ error: "No reports found." });
+        if (!reports || reports.length === 0) {
+            return res.status(404).json({ error: 'No reports found.' });
         }
 
-        // Group the data by childname
-        const groupedReports = report.map(r => {
-            return {
-                childname: r.childname,
-                sessions: r.sessions.map(session => ({
-                    sessionid: session.sessionId,
-                    isProcessed: session.isProcessed,
-                    images: session.images.map(image => ({
-                        imgpath: image.imgpath,
-                        screenshotpath: image.screenshotpath,
-                        emotions: image.emotions, // Include emotions
-                        max_emotion_img: image.max_emotion_img // Include max emotion image
-                    })),
-                    scores: session.scores
-                }))
-            };
-        });
+        // Shape data for the frontend charts
+        const grouped = reports.map((r) => ({
+            childname: r.childname,
+            sessions: (r.sessions || []).map((session) => ({
+                sessionId:      session.sessionId,
+                sessiondate:    session.sessiondate,
+                isProcessed:    session.isProcessed,
+                scores:         session.scores || [],
+                emotion_events: (session.emotion_events || []).map((ev) => ({
+                    gameId:           ev.gameId,
+                    qid:              ev.qid,
+                    timestamp:        ev.timestamp,
+                    emotions:         ev.emotions,
+                    dominant_emotion: ev.dominant_emotion,
+                    dominant_score:   ev.dominant_score,
+                })),
+            })),
+        }));
 
-        // Send the grouped data as an array to the front-end
-        res.status(200).json(groupedReports);
-    } catch (error) {
-        console.error("Error fetching reports:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(200).json(grouped);
+    } catch (err) {
+        console.error('Error fetching reports:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 }
 
+/**
+ * GET /reports/:childName/:sessionID
+ * Returns one specific session with all its emotion_events.
+ */
 async function handleSpecificSession(req, res) {
     const { childName, sessionID } = req.params;
 
     try {
-        // Query the database for the specific child and session ID
-        const report = await reports.findOne(
-            {
-                childname: childName, // Match the child name
-                "sessions.sessionId": sessionID // Match the session ID in the sessions array
-            },
-            {
-                _id: 0, // Exclude the _id field if not needed
-                "sessions": { $elemMatch: { sessionId: sessionID } } // Extract only the specific session
-            }
-        );
+        const report = await Report.findOne(
+            { childname: childName, 'sessions.sessionId': sessionID },
+            { sessions: { $elemMatch: { sessionId: sessionID } } }
+        ).lean();
 
-        // If no matching session is found, return a 404 response
-        if (!report || !report.sessions || report.sessions.length === 0) {
-            return res.status(404).json({ error: "No report found for the specified child and session." });
+        if (!report || !report.sessions?.length) {
+            return res.status(404).json({ error: 'No report found for the specified child and session.' });
         }
 
-        // Respond with the matching session details
-        res.status(200).json(report.sessions[0]); // Return only the session object
-    } catch (error) {
-        console.error("Error fetching specific session:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(200).json(report.sessions[0]);
+    } catch (err) {
+        console.error('Error fetching specific session:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 }
 
-
-
-module.exports = {
-    handleReport,
-    handleSpecificSession,
-};
-
+module.exports = { handleReport, handleSpecificSession };

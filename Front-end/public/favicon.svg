@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Background -->
+  <rect width="64" height="64" rx="14" fill="#0d1b2a"/>
+  <!-- Brain shape -->
+  <path d="M32 14 C24 14 18 20 18 28 C18 32 20 35 23 37 C21 38 19 40 19 43 C19 47 22 50 26 50 C27 50 28 50 29 49 C29.5 51 30.5 52 32 52 C33.5 52 34.5 51 35 49 C36 50 37 50 38 50 C42 50 45 47 45 43 C45 40 43 38 41 37 C44 35 46 32 46 28 C46 20 40 14 32 14Z" fill="#FF6B35" opacity="0.95"/>
+  <!-- Left lobe highlight -->
+  <path d="M23 26 C21 27 20 29 20.5 31.5" stroke="#FFD166" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>
+  <!-- Right lobe highlight -->
+  <path d="M41 26 C43 27 44 29 43.5 31.5" stroke="#FFD166" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>
+  <!-- Center split line -->
+  <path d="M32 16 L32 48" stroke="#0d1b2a" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+  <!-- Emotion pulse wave at bottom -->
+  <path d="M20 57 Q24 53 28 57 Q32 61 36 57 Q40 53 44 57" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.9"/>
+</svg>

@@ -1,217 +1,220 @@
 /* Navbar container styling */
 
 .navbar {
-    background-color: #4caf50;
-    /* Vibrant green color */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease-in-out;
+  background-color: #4caf50;
+  /* Vibrant green color */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
 }
 
 .navbar:hover {
-    background-color: #388e3c;
-    /* Slightly darker green on hover */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  background-color: #388e3c;
+  /* Slightly darker green on hover */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 
 /* Navbar brand */
 
 .navbar-brand {
-    font-size: 1.8rem;
-    color: #ffffff !important;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    transition: color 0.3s ease-in-out;
+  font-size: 1.8rem;
+  color: #ffffff !important;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: color 0.3s ease-in-out;
 }
 
 .navbar-brand:hover {
-    color: #ffeb3b !important;
-    /* Yellow on hover */
-    text-shadow: 0 0 10px rgba(255, 235, 59, 0.8);
+  color: #ffeb3b !important;
+  /* Yellow on hover */
+  text-shadow: 0 0 10px rgba(255, 235, 59, 0.8);
 }
 
 
 /* Navbar links */
 
 .nav-link {
-    color: #ffffff !important;
-    font-size: 1.2rem;
-    margin: 0 10px;
-    text-transform: capitalize;
-    transition: all 0.3s ease-in-out;
+  color: #ffffff !important;
+  font-size: 1.2rem;
+  margin: 0 10px;
+  text-transform: capitalize;
+  transition: all 0.3s ease-in-out;
 }
 
 .nav-link:hover {
-    color: #ffeb3b !important;
-    /* Yellow on hover */
-    font-weight: bold;
-    transform: scale(1.1);
+  color: #ffeb3b !important;
+  /* Yellow on hover */
+  font-weight: bold;
+  transform: scale(1.1);
 }
 
 
 /* Navbar toggler icon */
 
 .navbar-toggler {
-    border: none;
-    transition: all 0.3s ease-in-out;
+  border: none;
+  transition: all 0.3s ease-in-out;
 }
 
 .navbar-toggler-icon {
-    background-color: #ffffff;
-    border-radius: 50%;
-    padding: 5px;
-    transition: all 0.3s ease-in-out;
+  background-color: #ffffff;
+  border-radius: 50%;
+  padding: 5px;
+  transition: all 0.3s ease-in-out;
 }
 
 .navbar-toggler-icon:hover {
-    transform: rotate(90deg);
-    background-color: #ffeb3b;
-    /* Yellow on hover */
+  transform: rotate(90deg);
+  background-color: #ffeb3b;
+  /* Yellow on hover */
 }
 
 
 /* Collapsible section */
 
 .collapse {
-    transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease-in-out;
 }
 
 
 /* Responsive styling for small screens */
 
 @media (max-width: 768px) {
-    .navbar {
-        background-color: #388e3c;
-    }
-    .nav-link {
-        font-size: 1rem;
-        margin: 5px 0;
-    }
-    .navbar-brand {
-        font-size: 1.5rem;
-    }
+  .navbar {
+    background-color: #388e3c;
+  }
+
+  .nav-link {
+    font-size: 1rem;
+    margin: 5px 0;
+  }
+
+  .navbar-brand {
+    font-size: 1.5rem;
+  }
 }
 
 
 /* Navbar Style */
 
 .navbar {
-    width: 100%;
-    background-color: #2C3E50;
-    /* Deep blue-grey background */
-    padding: 15px 30px;
-    /* Adjusted padding for better space */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    transition: background-color 0.4s ease, box-shadow 0.4s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    /* Subtle shadow for better contrast */
+  width: 100%;
+  background-color: #2C3E50;
+  /* Deep blue-grey background */
+  padding: 15px 30px;
+  /* Adjusted padding for better space */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  transition: background-color 0.4s ease, box-shadow 0.4s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  /* Subtle shadow for better contrast */
 }
 
 
 /* Navbar Link Style */
 
 .navbar a {
-    color: #ECF0F1;
-    /* Light grey color for text */
-    text-decoration: none;
-    margin: 0 20px;
-    /* Increased margin for more space between links */
-    font-weight: bold;
-    font-size: 1.1rem;
-    /* Slightly larger font for readability */
-    letter-spacing: 1px;
-    /* Adds a bit of spacing between letters for elegance */
-    text-transform: uppercase;
-    /* Makes the links all uppercase */
-    transition: color 0.3s ease, transform 0.3s ease, letter-spacing 0.3s ease;
+  color: #ECF0F1;
+  /* Light grey color for text */
+  text-decoration: none;
+  margin: 0 20px;
+  /* Increased margin for more space between links */
+  font-weight: bold;
+  font-size: 1.1rem;
+  /* Slightly larger font for readability */
+  letter-spacing: 1px;
+  /* Adds a bit of spacing between letters for elegance */
+  text-transform: uppercase;
+  /* Makes the links all uppercase */
+  transition: color 0.3s ease, transform 0.3s ease, letter-spacing 0.3s ease;
 }
 
 
 /* Navbar Link Hover Effect */
 
 .navbar a:hover {
-    color: #F39C12;
-    /* Vibrant yellow color on hover */
-    transform: scale(1.1);
-    /* Slight zoom-in effect */
-    letter-spacing: 2px;
-    /* More spacing between letters on hover */
+  color: #F39C12;
+  /* Vibrant yellow color on hover */
+  transform: scale(1.1);
+  /* Slight zoom-in effect */
+  letter-spacing: 2px;
+  /* More spacing between letters on hover */
 }
 
 
 /* Navbar Active Link */
 
 .navbar a.active {
-    color: #E74C3C;
-    /* Red color for active state */
-    font-style: italic;
-    /* Makes the active link italicized for emphasis */
+  color: #E74C3C;
+  /* Red color for active state */
+  font-style: italic;
+  /* Makes the active link italicized for emphasis */
 }
 
 
 /* Sticky navbar effect */
 
 .navbar.scrolled {
-    background-color: #34495E;
-    /* Darker shade of blue-grey when scrolled */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-    /* Slightly stronger shadow */
+  background-color: #34495E;
+  /* Darker shade of blue-grey when scrolled */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+  /* Slightly stronger shadow */
 }
 
 
 /* Toggler icon for smaller screens */
 
 .navbar-toggler-icon {
-    background-color: #ECF0F1;
-    /* Light grey icon for better visibility */
+  background-color: #ECF0F1;
+  /* Light grey icon for better visibility */
 }
 
 
 /* Hover effect on the navbar toggler icon */
 
 .navbar-toggler-icon:hover {
-    background-color: #F39C12;
-    /* Yellow color on hover */
-    transform: rotate(90deg);
-    /* Rotate icon when hovered */
-    transition: transform 0.3s ease, background-color 0.3s ease;
+  background-color: #F39C12;
+  /* Yellow color on hover */
+  transform: rotate(90deg);
+  /* Rotate icon when hovered */
+  transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
 
 /* Extra responsiveness for small screens */
 
 @media (max-width: 768px) {
-    .navbar {
-        padding: 10px 15px;
-        /* Adjust padding for smaller screens */
-    }
-    .navbar a {
-        font-size: 0.9rem;
-        /* Slightly smaller text size */
-        margin: 0 10px;
-        /* Reduced margin for small screens */
-    }
-}
+  .navbar {
+    padding: 10px 15px;
+    /* Adjust padding for smaller screens */
+  }
 
-#nav-btn {
-    font-size: 1.2rem;
+  .navbar a {
+    font-size: 0.9rem;
+    /* Slightly smaller text size */
     margin: 0 10px;
-    text-transform: capitalize;
-    transition: all 0.3s ease-in-out;
+    /* Reduced margin for small screens */
+  }
 }
 
 #nav-btn {
-    color: #ffeb3b !important;
-    /* Yellow on hover */
-    font-weight: bold;
-    transform: scale(1.1);
+  font-size: 1.2rem;
+  margin: 0 10px;
+  text-transform: capitalize;
+  transition: all 0.3s ease-in-out;
+}
+
+#nav-btn {
+  color: #ffeb3b !important;
+  /* Yellow on hover */
+  font-weight: bold;
+  transform: scale(1.1);
 }
 
 
@@ -221,63 +224,63 @@
 /* Custom brand styles */
 
 .navbar-brand {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
 }
 
 
 /* Nav links */
 
 .navbar-nav .nav-link {
-    font-size: 1rem;
-    color: #555;
-    transition: color 0.3s ease;
+  font-size: 1rem;
+  color: #555;
+  transition: color 0.3s ease;
 }
 
 .navbar-nav .nav-link:hover {
-    color: #007bff;
+  color: #007bff;
 }
 
 
 /* Toggler button */
 
 .navbar-toggler {
-    border: none;
-    outline: none;
+  border: none;
+  outline: none;
 }
 
 .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23333' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(0,0,0,0.5)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23333' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(0,0,0,0.5)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
 }
 
 
 /* Collapsible navbar styles */
 
 .collapse {
-    transition: height 0.35s ease;
+  transition: height 0.35s ease;
 }
 
 
 /* Align buttons or links to the right */
 
 .navbar-nav.ms-auto {
-    margin-left: auto;
+  margin-left: auto;
 }
 
 
 /* Logout button styles */
 
 .nav-btn {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
 }
 
 .nav-btn:hover {
-    background-color: #b52a38;
-    color: #fff;
+  background-color: #b52a38;
+  color: #fff;
 }

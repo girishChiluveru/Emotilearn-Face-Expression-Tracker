@@ -1,80 +1,344 @@
-# Emotion-Aware Learning Support System for Dyslexic Children
+# Emotilearn: Emotion-Aware Learning Support System for Dyslexic Children
 
-## Introduction
+## 🎯 Project Overview
 
-**Emotion-Aware Learning Support System for Dyslexic Children** is a web-based application designed to enhance the educational experience for dyslexic children. By leveraging advanced facial emotion recognition technologies, the system tracks emotional states such as frustration, confusion, or engagement in real-time, offering valuable feedback to teachers and parents. This enables adaptive learning tailored to each child's emotional journey.
+**Emotilearn** is a full-stack web application that combines artificial intelligence with educational gaming to support dyslexic children's learning journey. The system leverages **real-time facial emotion recognition** to detect emotional states (frustration, confusion, engagement) while children participate in educational games, providing teachers and parents with actionable insights for personalized learning support.
 
-## Features
+### Core Value Proposition
 
-- **Real-Time Facial Emotion Detection**  
-  Utilizes DeepFace for instant facial emotion recognition via webcam.
+- 📊 **Real-time emotion tracking** during educational activities
+- 🎮 **Gamified learning experiences** (Quiz, Memory Game, Animal Game)
+- 📈 **Data-driven progress reports** for teachers and parents
+- 🤖 **AI-powered adaptive feedback** based on emotional patterns
 
-- **Emotion Classification**  
-  Employs Hugging Face Vision Transformer (ViT) for robust emotion classification.
+---
 
-- **Dashboard Visualizations**  
-  Interactive dashboard displays detected emotions and analytical insights.
+## 🏗️ Architecture Overview
 
-- **Data Logging & Progress Reports**  
-  Records emotional data over time for progress tracking and reporting.
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Frontend (React + Vite)                                        │
+│  - Child login & game interfaces                                │
+│  - Real-time webcam + emotion visualization                     │
+│  - Teacher/Parent dashboards with analytics                     │
+└────────────────────┬────────────────────────────────────────────┘
+                     │ WebSocket (Socket.io) + REST API
+┌────────────────────▼────────────────────────────────────────────┐
+│  Backend (Node.js + Express)                                    │
+│  - REST API (authentication, data management)                   │
+│  - WebSocket server for real-time emotion streaming             │
+│  - MongoDB data persistence                                     │
+└────────────────────┬────────────────────────────────────────────┘
+                     │ HTTP Inference API
+┌────────────────────▼────────────────────────────────────────────┐
+│  ML Service (FastAPI + PyTorch)                                 │
+│  - Emotion classification from facial landmarks                 │
+│  - Vision Transformer model inference                           │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-- **Adaptive Learning Suggestions**  
-  Recommends personalized learning strategies based on the child’s emotional state.
+For detailed deployment architecture, see [DEPLOYMENT_ARCHITECTURE.md](DEPLOYMENT_ARCHITECTURE.md).
 
-## Tech Stack
+---
 
-| Layer      | Technology                                        |
-|------------|---------------------------------------------------|
-| Frontend   | React, Vite                                       |
-| Backend    | Node.js, Express                                  |
-| AI Models  | DeepFace, Hugging Face ViT                        |
-| Database   | MongoDB                                           |
-                         
+## 🛠️ Tech Stack
 
-## Setup Instructions
+| Component          | Technology                           | Purpose                           |
+| ------------------ | ------------------------------------ | --------------------------------- |
+| **Frontend**       | React 18, Vite, TailwindCSS          | Web UI, real-time emotion display |
+| **Backend**        | Node.js 18+, Express, Socket.io      | REST API, WebSocket streaming     |
+| **Database**       | MongoDB 5+                           | User profiles, sessions, emotions |
+| **ML/AI**          | FastAPI, PyTorch, Vision Transformer | Emotion inference from landmarks  |
+| **Infrastructure** | AWS (EC2, RDS, S3, Lambda)           | Cloud deployment & scaling        |
+| **IaC**            | Terraform                            | Infrastructure as Code            |
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/girishChiluveru/Emotilearn-Face-Expression-Tracker.git
-   cd Emotilearn-Face-Expression-Tracker
-   ```
+---
 
-2. **Install dependencies**
-   - Frontend & Backend:
-     ```bash
-     npm install
-     ```
-   - AI Model (Python):
-     ```bash
-     pip install -r requirements.txt
-     ```
+## 📋 Features
 
-3. **Configure environment variables**
-   - Set API keys, database connection strings, and other secrets in a `.env` file.
+✅ **Child Authentication & Profiles**
 
-4. **Run the application**
-   - Start backend server:
-     ```bash
-     npm run server
-     ```
-   - Start frontend client:
-     ```bash
-     npm run dev
-     ```
+- Secure login/registration for children
+- Session tracking with session IDs
 
-## Usage
+✅ **Real-Time Emotion Detection**
 
-- Activate the webcam from the dashboard.
-- The application detects and analyzes the child’s facial emotions in real-time.
-- View the dashboard for insights and visualizations on emotional states.
-- Teachers and parents receive adaptive feedback and recommendations.
+- MediaPipe facial landmark extraction
+- Vision Transformer-based emotion classification
+- WebSocket streaming for sub-second latency
 
-## Future Scope
+✅ **Educational Games**
 
-- **Voice-Based Emotion Analysis**
-- **Multilingual Learning Insights**
-- **Integration with Adaptive E-Learning Platforms**
+- **Quiz Mode**: Question-based learning with emotion tracking
+- **Memory Game**: Card-matching game with emotional context
+- **Animal Game**: Interactive animal learning game
 
-## License
+✅ **Analytics & Reporting**
+
+- Per-session emotion analysis (happy, sad, angry, neutral, fearful, disgusted)
+- Emotion events linked to specific questions/game rounds
+- Teacher/Parent dashboards with charts and progress reports
+
+✅ **Admin Controls**
+
+- Super Admin dashboard for user management
+- Session history and processing status
+- Child profile management
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+, Python 3.9+, MongoDB 5+
+
+### Setup
+
+**1. Clone & Install**
+
+```bash
+git clone https://github.com/girishChiluveru/Emotilearn-Face-Expression-Tracker.git
+cd Emotilearn-Face-Expression-Tracker
+
+# Backend dependencies
+cd Back-end && npm install && cd ..
+
+# Frontend dependencies
+cd Front-end && npm install && cd ..
+
+# ML service dependencies
+cd TransformerModel && pip install -r requirements.txt && cd ..
+```
+
+**2. Configure Environment**
+
+Backend (`Back-end/.env`):
+
+```env
+PORT=3000
+NODE_ENV=development
+CONNECTION_STRING=mongodb://localhost:27017/emotilearn
+JWT_SECRET=your-secret-key-here
+ADMIN_ID=admin_username
+ADMIN_PASS=admin_password
+AI_SERVICE_URL=http://localhost:8000
+FRONTEND_URL=http://localhost:5173
+```
+
+Frontend (`Front-end/.env.local`):
+
+```env
+VITE_API_URL=http://localhost:3000
+VITE_SOCKET_URL=http://localhost:3000
+```
+
+ML Service (`TransformerModel/.env`):
+
+```env
+PORT=8000
+ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+ARTIFACTS_DIR=artifacts
+```
+
+**3. Start Services**
+
+```bash
+# Terminal 1: Backend
+cd Back-end && npm run dev
+
+# Terminal 2: Frontend
+cd Front-end && npm run dev
+
+# Terminal 3: ML Service
+cd TransformerModel && uvicorn main:app --reload
+```
+
+Visit: http://localhost:5173
+
+---
+
+## 📁 Project Structure
+
+```
+Emotilearn-Face-Expression-Tracker/
+├── Back-end/              # Node.js/Express backend
+│   ├── server.js         # Express app entry point
+│   ├── connection.js     # MongoDB connection
+│   ├── controllers/      # Business logic
+│   ├── routes/           # API endpoints
+│   ├── models/           # MongoDB schemas
+│   └── photos/           # User-uploaded images
+│
+├── Front-end/            # React + Vite frontend
+│   ├── src/
+│   │   ├── components/   # React components
+│   │   ├── context/      # Global state
+│   │   ├── styles/       # CSS files
+│   │   └── main.jsx      # App entry
+│   └── index.html
+│
+├── TransformerModel/     # FastAPI ML service
+│   ├── main.py          # FastAPI server
+│   ├── model.py         # PyTorch model
+│   ├── config.py        # Settings
+│   ├── artifacts/       # Trained model weights
+│   └── requirements.txt
+│
+└── deployment/          # Infrastructure as Code
+    └── terraform/       # AWS deployment configs
+```
+
+---
+
+## 🔐 Security Considerations
+
+⚠️ **Before Production Deployment:**
+
+- [ ] Change default admin credentials in environment variables
+- [ ] Use strong JWT secrets (32+ character random string)
+- [ ] Enable HTTPS/SSL certificates
+- [ ] Set up database backups and monitoring
+- [ ] Implement rate limiting on all endpoints
+- [ ] Use AWS Secrets Manager for sensitive data
+- [ ] Enable VPC security groups and network ACLs
+- [ ] Add Web Application Firewall (WAF)
+
+See [DEPLOYMENT_ARCHITECTURE.md](DEPLOYMENT_ARCHITECTURE.md#security-checklist) for production security setup.
+
+---
+
+## 📊 Data Models
+
+### Child Profile (MongoDB)
+
+```json
+{
+  "childname": "string",
+  "password": "hashed_bcrypt",
+  "sessions": [
+    {
+      "sessionId": "uuid",
+      "loginTime": "date",
+      "logoutTime": "date",
+      "emotion_events": [...],
+      "scores": [...]
+    }
+  ]
+}
+```
+
+### Emotion Event
+
+```json
+{
+  "gameId": "quiz|animal|memory",
+  "qid": "question_id",
+  "timestamp": "date",
+  "emotions": {
+    "happy": 0.85,
+    "sad": 0.05,
+    "angry": 0.02,
+    "neutral": 0.08,
+    "fearful": 0.0,
+    "disgusted": 0.0
+  },
+  "dominant_emotion": "happy",
+  "dominant_score": 0.85
+}
+```
+
+---
+
+## 🔄 API Endpoints
+
+### Authentication
+
+- `POST /register` - Register new child account
+- `POST /login` - Child login
+- `POST /admin/login` - Admin login
+- `GET /profile` - Get current user profile
+- `POST /logout` - Logout user
+
+### Reports & Data
+
+- `GET /reports/children` - List all children (admin)
+- `GET /reports/report/:childname` - Get child's emotion report
+- `POST /store-scores` - Save game scores
+- `PATCH /sessions/:childId/:sessionId` - Mark session as processed
+
+### WebSocket Events
+
+- `landmarks` - Send facial landmarks (468 points × 3 coords)
+- `emotion_result` - Receive emotion predictions
+- `emotion_error` - Error notifications
+
+---
+
+## 📈 Performance Metrics
+
+Target metrics for production:
+
+- **API Response Time**: < 200ms (p95)
+- **Emotion Detection Latency**: < 500ms (WebSocket)
+- **Database Query Time**: < 50ms (p95)
+- **Frontend Load Time**: < 2s (first paint)
+
+---
+
+## 🐛 Troubleshooting
+
+**MongoDB Connection Error**
+
+```bash
+# Ensure MongoDB is running
+mongod
+
+# Check connection string in .env
+CONNECTION_STRING=mongodb://localhost:27017/emotilearn
+```
+
+**AI Service Unavailable**
+
+```bash
+# Verify FastAPI is running
+cd TransformerModel && uvicorn main:app --reload
+
+# Check AI_SERVICE_URL in backend .env
+AI_SERVICE_URL=http://localhost:8000
+```
+
+**WebSocket Connection Issues**
+
+- Verify `FRONTEND_URL` matches actual frontend origin
+- Check browser console for CORS errors
+
+---
+
+## 🤝 Contributing
+
+1. Create a feature branch: `git checkout -b feature/your-feature`
+2. Commit changes: `git commit -m "Add your feature"`
+3. Push to branch: `git push origin feature/your-feature`
+4. Create Pull Request
+
+---
+
+## 📚 Documentation
+
+- [DEPLOYMENT_ARCHITECTURE.md](DEPLOYMENT_ARCHITECTURE.md) - Production deployment guide
+- [QUICK_START_GUIDE.md](QUICK_START_GUIDE.md) - Quick reference for development
+- [Explain.md](Explain.md) - Detailed codebase breakdown
+
+---
+
+## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## ✉️ Contact & Support
+
+**Project Owner:** Girish Chiluveru  
+**Repository:** https://github.com/girishChiluveru/Emotilearn-Face-Expression-Tracker
