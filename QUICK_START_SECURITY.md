@@ -77,40 +77,44 @@ curl http://localhost:3000/health/ai
 
 ```javascript
 // src/main.jsx
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider } from "./context/AuthContext";
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(document.getElementById("root")).render(
   <AuthProvider>
     <App />
-  </AuthProvider>
+  </AuthProvider>,
 );
 ```
 
 ### 2. Login Component
 
 ```javascript
-import { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 function LoginPage() {
   const { login } = useContext(AuthContext);
-  const [childname, setChildname] = useState('');
-  const [password, setPassword] = useState('');
+  const [childname, setChildname] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await login(childname, password);
-      window.location.href = '/dashboard';
+      window.location.href = "/dashboard";
     } catch (error) {
-      alert(error.response?.data?.message || 'Login failed');
+      alert(error.response?.data?.message || "Login failed");
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <input value={childname} onChange={(e) => setChildname(e.target.value)} />
-      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
       <button type="submit">Login</button>
     </form>
   );
@@ -120,7 +124,7 @@ function LoginPage() {
 ### 3. Protected API Calls
 
 ```javascript
-import apiClient from '../services/api';
+import apiClient from "../services/api";
 
 // Already includes:
 // - JWT token in Authorization header
@@ -128,7 +132,7 @@ import apiClient from '../services/api';
 // - Idempotency-Key for POST/PUT/DELETE
 // - Automatic token refresh on 401
 
-const response = await apiClient.get('/profile');
+const response = await apiClient.get("/profile");
 ```
 
 ### 4. WebSocket Connection
@@ -232,35 +236,35 @@ npm run preview
 
 ### Authentication
 
-| Method | Endpoint | Auth | Purpose |
-|--------|----------|------|---------|
-| GET | `/csrf-token` | No | Get CSRF token |
-| POST | `/register` | No | Register child |
-| POST | `/login` | No | Login child |
-| POST | `/admin/login` | No | Admin login |
-| GET | `/profile` | Yes | Get user profile |
-| POST | `/logout` | Yes | Logout |
+| Method | Endpoint       | Auth | Purpose          |
+| ------ | -------------- | ---- | ---------------- |
+| GET    | `/csrf-token`  | No   | Get CSRF token   |
+| POST   | `/register`    | No   | Register child   |
+| POST   | `/login`       | No   | Login child      |
+| POST   | `/admin/login` | No   | Admin login      |
+| GET    | `/profile`     | Yes  | Get user profile |
+| POST   | `/logout`      | Yes  | Logout           |
 
 ### Scores
 
-| Method | Endpoint | Auth | Purpose |
-|--------|----------|------|---------|
-| POST | `/store-scores` | Yes | Save game score |
+| Method | Endpoint        | Auth | Purpose         |
+| ------ | --------------- | ---- | --------------- |
+| POST   | `/store-scores` | Yes  | Save game score |
 
 ### Reports
 
-| Method | Endpoint | Auth | Purpose |
-|--------|----------|------|---------|
-| GET | `/reports/children` | Yes | Get all children |
-| GET | `/reports/report/<name>` | Yes | Get child report |
+| Method | Endpoint                 | Auth | Purpose          |
+| ------ | ------------------------ | ---- | ---------------- |
+| GET    | `/reports/children`      | Yes  | Get all children |
+| GET    | `/reports/report/<name>` | Yes  | Get child report |
 
 ### Health
 
-| Method | Endpoint | Auth | Purpose |
-|--------|----------|------|---------|
-| GET | `/health` | No | Server health |
-| GET | `/health/db` | No | Database health |
-| GET | `/health/ai` | No | AI service health |
+| Method | Endpoint     | Auth | Purpose           |
+| ------ | ------------ | ---- | ----------------- |
+| GET    | `/health`    | No   | Server health     |
+| GET    | `/health/db` | No   | Database health   |
+| GET    | `/health/ai` | No   | AI service health |
 
 ---
 
@@ -277,20 +281,20 @@ DEBUG=app:*
 
 ```javascript
 // In browser console
-const token = localStorage.getItem('token');
-const decoded = JSON.parse(atob(token.split('.')[1]));
+const token = localStorage.getItem("token");
+const decoded = JSON.parse(atob(token.split(".")[1]));
 console.log(decoded);
 ```
 
 ### WebSocket Debug
 
 ```javascript
-socket.on('connect_error', (error) => {
-  console.error('WebSocket error:', error);
+socket.on("connect_error", (error) => {
+  console.error("WebSocket error:", error);
 });
 
-socket.on('emotion_error', (error) => {
-  console.error('Emotion error:', error);
+socket.on("emotion_error", (error) => {
+  console.error("Emotion error:", error);
 });
 ```
 
@@ -330,24 +334,32 @@ artillery quick --count 1000 --num 100 http://localhost:3000/health
 ## Troubleshooting
 
 ### "No authentication token provided"
+
 **Solution**: Add `Authorization: Bearer <token>` header
 
 ### "CSRF validation failed"
-**Solution**: 
+
+**Solution**:
+
 1. Call `/csrf-token` endpoint first
 2. Use returned token in `X-CSRF-Token` header
 
 ### WebSocket connection refused
-**Solution**: 
+
+**Solution**:
+
 1. Check token is valid
 2. Ensure query params include: `childname`, `sessionId`, `token`
 3. Check browser console for JWT error
 
 ### "Too many requests"
+
 **Solution**: Wait 15 minutes or change IP
 
 ### 304 Not Modified (caching issue)
-**Solution**: 
+
+**Solution**:
+
 - This is normal! It means data hasn't changed
 - If you need fresh data, use `Cache-Control: no-cache`
 
@@ -367,6 +379,7 @@ Quick links to detailed documentation:
 ## Getting Help
 
 ### Check Logs
+
 ```bash
 # Backend
 tail -f logs/emotilearn.log
@@ -376,6 +389,7 @@ F12 → Console
 ```
 
 ### Verify Configuration
+
 ```javascript
 // .env values set correctly
 // JWT_SECRET length >= 32
@@ -384,6 +398,7 @@ F12 → Console
 ```
 
 ### Test Connectivity
+
 ```bash
 # Test MongoDB
 mongosh mongodb://localhost:27017/emotilearn

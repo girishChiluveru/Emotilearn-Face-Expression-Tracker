@@ -15,6 +15,7 @@
 **Feature**: Token-based authentication with automatic refresh
 
 **What's New**:
+
 - ✅ JWT token generation (HS256 algorithm)
 - ✅ Automatic token refresh (within 1 hour of expiration)
 - ✅ Multi-location token support (header, cookie, body)
@@ -23,20 +24,23 @@
 - ✅ 24-hour default expiration
 
 **Files Added**:
+
 - `Back-end/utils/jwtUtils.js`
 - `Back-end/middleware/authMiddleware.js`
 
 **API Changes**:
+
 - New response header: `X-New-Token` (when token is refreshed)
 - All protected routes now require valid JWT
 
 **Migration Guide**:
+
 ```javascript
 // Old way (removed):
 // jwt.sign() in each controller
 
 // New way (use utils):
-const { generateToken, verifyToken } = require('../utils/jwtUtils');
+const { generateToken, verifyToken } = require("../utils/jwtUtils");
 const token = generateToken({ childname, id });
 ```
 
@@ -47,6 +51,7 @@ const token = generateToken({ childname, id });
 **Feature**: Double-submit cookie pattern protection
 
 **What's New**:
+
 - ✅ CSRF token generation endpoint
 - ✅ Token verification on state-changing requests
 - ✅ HttpOnly cookie storage
@@ -54,25 +59,28 @@ const token = generateToken({ childname, id });
 - ✅ SameSite=strict cookies
 
 **Files Added**:
+
 - `Back-end/middleware/csrfProtection.js`
 
 **API Changes**:
+
 - New endpoint: `GET /csrf-token`
 - Required header: `X-CSRF-Token` on POST/PUT/DELETE/PATCH
 - New cookie: `__csrf_token`
 
 **Frontend Integration**:
+
 ```javascript
 // Must be called on app initialization
-const csrf = await fetch('/csrf-token').then(r => r.json());
-sessionStorage.setItem('csrfToken', csrf.csrfToken);
+const csrf = await fetch("/csrf-token").then((r) => r.json());
+sessionStorage.setItem("csrfToken", csrf.csrfToken);
 
 // Use in requests
-fetch('/register', {
-  method: 'POST',
+fetch("/register", {
+  method: "POST",
   headers: {
-    'X-CSRF-Token': sessionStorage.getItem('csrfToken')
-  }
+    "X-CSRF-Token": sessionStorage.getItem("csrfToken"),
+  },
 });
 ```
 
@@ -83,6 +91,7 @@ fetch('/register', {
 **Feature**: Reduce bandwidth by 90% with 304 responses
 
 **What's New**:
+
 - ✅ ETag generation (SHA256)
 - ✅ 304 Not Modified responses
 - ✅ Cache-Control headers
@@ -91,14 +100,17 @@ fetch('/register', {
 - ✅ Redis-ready for production
 
 **Files Added**:
+
 - `Back-end/middleware/etagMiddleware.js`
 
 **API Changes**:
+
 - New response header: `ETag: "hash"`
 - New response header: `Cache-Control: private, max-age=300`
 - New response header: `X-Cache: HIT/MISS`
 
 **Performance Impact**:
+
 - 90% bandwidth reduction for unchanged content
 - First request: ~100ms
 - Cached request: ~50ms
@@ -111,6 +123,7 @@ fetch('/register', {
 **Feature**: Safe duplicate request handling
 
 **What's New**:
+
 - ✅ Idempotency-Key header validation
 - ✅ Response caching (24 hours)
 - ✅ UUID format validation
@@ -118,13 +131,16 @@ fetch('/register', {
 - ✅ Redis-ready for production
 
 **Files Added**:
+
 - `Back-end/middleware/idempotencyMiddleware.js`
 
 **API Changes**:
+
 - Required header: `Idempotency-Key: <uuid>`
 - Response header: `Idempotency-Replay: true` (on duplicate)
 
 **Applied To**:
+
 - POST /children
 - POST /admins
 - POST /store-scores
@@ -133,13 +149,14 @@ fetch('/register', {
 - DELETE /admins/:id
 
 **Usage Example**:
+
 ```javascript
 const idempotencyKey = crypto.randomUUID();
-fetch('/store-scores', {
-  method: 'POST',
+fetch("/store-scores", {
+  method: "POST",
   headers: {
-    'Idempotency-Key': idempotencyKey
-  }
+    "Idempotency-Key": idempotencyKey,
+  },
 });
 // Safe to retry with same key
 ```
@@ -151,6 +168,7 @@ fetch('/store-scores', {
 **Feature**: Schema-based input validation
 
 **What's New**:
+
 - ✅ 9 Joi validation schemas
 - ✅ Field-level error messages
 - ✅ Type coercion
@@ -158,9 +176,11 @@ fetch('/store-scores', {
 - ✅ Extensible schema pattern
 
 **Files Added**:
+
 - `Back-end/middleware/requestValidation.js`
 
 **Schemas Added**:
+
 1. registerChildSchema - Childname, Password validation
 2. loginChildSchema - Login credentials
 3. adminLoginSchema - Admin credentials
@@ -172,6 +192,7 @@ fetch('/store-scores', {
 9. sessionJoinSchema - Session validation
 
 **Error Response Format**:
+
 ```json
 {
   "error": "Validation failed",
@@ -186,11 +207,12 @@ fetch('/store-scores', {
 ```
 
 **Password Requirements**:
+
 - Minimum 8 characters
 - At least 1 uppercase letter (A-Z)
 - At least 1 lowercase letter (a-z)
 - At least 1 digit (0-9)
-- At least 1 special character (@$!%*?&)
+- At least 1 special character (@$!%\*?&)
 
 ---
 
@@ -199,6 +221,7 @@ fetch('/store-scores', {
 **Feature**: Consistent error responses
 
 **What's New**:
+
 - ✅ Global error middleware
 - ✅ Specific error type handling
 - ✅ HTTP status code mapping
@@ -206,9 +229,11 @@ fetch('/store-scores', {
 - ✅ 404 handler
 
 **Files Added**:
+
 - `Back-end/middleware/errorHandler.js`
 
 **Error Response Format**:
+
 ```json
 {
   "error": "Error Type",
@@ -218,6 +243,7 @@ fetch('/store-scores', {
 ```
 
 **HTTP Status Codes**:
+
 - 400: Bad Request (validation error)
 - 401: Unauthorized (invalid token)
 - 403: Forbidden (CSRF validation failed)
@@ -232,9 +258,11 @@ fetch('/store-scores', {
 **Feature**: Integrated middleware stack
 
 **Files Modified**:
+
 - `Back-end/server.js` (complete rewrite)
 
 **What's Changed**:
+
 - ✅ Helmet security headers
 - ✅ CORS configuration
 - ✅ Rate limiting
@@ -245,11 +273,13 @@ fetch('/store-scores', {
 - ✅ Graceful shutdown handling
 
 **New Endpoints**:
+
 - GET /health - Server health
 - GET /health/db - Database health
 - GET /health/ai - AI service health
 
 **Middleware Order** (critical):
+
 1. Helmet (security headers)
 2. CORS
 3. Body parser
@@ -267,9 +297,11 @@ fetch('/store-scores', {
 ### 🔑 Authentication Controllers
 
 **Files Modified**:
+
 - `Back-end/controllers/authControllers.js` (complete rewrite)
 
 **What's Changed**:
+
 - ✅ JWT token generation on login
 - ✅ Automatic token refresh
 - ✅ Session creation
@@ -279,12 +311,14 @@ fetch('/store-scores', {
 - ✅ Password validation
 
 **API Changes**:
+
 - Login response now includes JWT token
 - Registration response includes JWT token
 - Profile endpoint requires authentication
 - New endpoint: POST /refresh (token refresh)
 
 **Response Format**:
+
 ```json
 {
   "message": "Login successful",
@@ -302,9 +336,11 @@ fetch('/store-scores', {
 ### 🔌 WebSocket Security
 
 **Files Modified**:
+
 - `Back-end/controllers/emotionSocket.js` (complete rewrite)
 
 **What's Changed**:
+
 - ✅ JWT verification middleware
 - ✅ Session validation
 - ✅ Token refresh on connect
@@ -313,6 +349,7 @@ fetch('/store-scores', {
 - ✅ Connection validation
 
 **Connection Requirements**:
+
 ```javascript
 socket.io query params required:
 - childname: string
@@ -324,6 +361,7 @@ socket.io query params required:
 ```
 
 **New Events**:
+
 - `token_refreshed` - Token was auto-refreshed
 - Enhanced `emotion_error` with error types
 
@@ -334,16 +372,18 @@ socket.io query params required:
 ### 📝 Environment Variables
 
 **File Added**:
+
 - `Back-end/.env.example`
 
 **New Variables**:
+
 - JWT_SECRET (required)
 - JWT_EXPIRY (default: 24h)
 - ADMIN_DEFAULT_ID
 - ADMIN_DEFAULT_PASSWORD
 - AI_SERVICE_TIMEOUT
 - REDIS_URL (optional, production)
-- RATE_LIMIT_* (new parameters)
+- RATE*LIMIT*\* (new parameters)
 - Various AWS/deployment settings
 
 ---
@@ -477,20 +517,24 @@ For existing frontends:
 ## Performance Metrics
 
 ### Bandwidth Usage
+
 - Without caching: 1.5MB per 1000 requests
 - With ETag: 0.2MB per 1000 requests
 - Savings: **87% reduction**
 
 ### Response Time
+
 - Fresh response: ~100ms
 - Cached (304): ~50ms
 - Improvement: **50% faster**
 
 ### Validation Overhead
+
 - Per request: <1ms
 - Impact: **Negligible**
 
 ### Token Overhead
+
 - JWT size: ~500 bytes
 - Per request: <1ms
 - Impact: **Minimal**
@@ -500,6 +544,7 @@ For existing frontends:
 ## Deployment Changes
 
 ### Required Environment Variables
+
 ```bash
 # Critical - must set
 JWT_SECRET=<32-char-random-string>
@@ -537,6 +582,7 @@ FRONTEND_URL=<react-url>
 ## Testing Recommendations
 
 ### Unit Tests
+
 - [ ] JWT generation and verification
 - [ ] CSRF token generation and validation
 - [ ] ETag generation and caching
@@ -544,6 +590,7 @@ FRONTEND_URL=<react-url>
 - [ ] Error handling for each error type
 
 ### Integration Tests
+
 - [ ] Authentication flow (register → login → protected route)
 - [ ] CSRF protection (valid token, invalid token)
 - [ ] Token refresh (expiring token, refresh flow)
@@ -551,6 +598,7 @@ FRONTEND_URL=<react-url>
 - [ ] Rate limiting (exceed limit, reset)
 
 ### Security Tests
+
 - [ ] SQL injection prevention
 - [ ] XSS prevention
 - [ ] CSRF protection
@@ -559,6 +607,7 @@ FRONTEND_URL=<react-url>
 - [ ] Password strength
 
 ### Load Tests
+
 - [ ] 1000 requests/second
 - [ ] Cache hit ratio >80%
 - [ ] P99 response time <500ms
@@ -571,21 +620,25 @@ FRONTEND_URL=<react-url>
 If issues occur after deployment:
 
 1. **Disable JWT** (development only):
+
    ```javascript
    // In authMiddleware.js, remove token verification
    ```
 
 2. **Disable CSRF** (not recommended):
+
    ```javascript
    // In csrfProtection.js, skip verification
    ```
 
 3. **Disable Caching**:
+
    ```javascript
    // Remove etagMiddleware from server.js
    ```
 
 4. **Disable Rate Limiting**:
+
    ```javascript
    // Remove limiter from server.js
    ```
@@ -600,11 +653,13 @@ If issues occur after deployment:
 ## Known Issues & Limitations
 
 ### Development
+
 - ⚠️ In-memory cache limited to available RAM
 - ⚠️ Idempotency store lost on server restart
 - ⚠️ Session tokens don't persist across server restarts
 
 ### Production Requirements
+
 - ✅ Use Redis for cache store
 - ✅ Use Redis for idempotency store
 - ✅ Use AWS Secrets Manager for JWT_SECRET
@@ -612,6 +667,7 @@ If issues occur after deployment:
 - ✅ Configure proper CORS origins
 
 ### Future Improvements
+
 - [ ] Implement refresh token (separate from access token)
 - [ ] Add rate limiting per user instead of IP
 - [ ] Implement distributed session management
