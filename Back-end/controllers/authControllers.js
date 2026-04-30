@@ -6,6 +6,31 @@ const { v4: uuidv4 } = require('uuid');
 
 const test = (req, res) => { res.json('It is working'); };
 
+const adminLogin = async (req, res) => {
+    try {
+        const { id, password } = req.body;
+        if (!id || !password) return res.status(400).json({ error: "Credentials required" });
+
+        const ADMIN_ID = process.env.ADMIN_ID || '123';
+        const ADMIN_PASS = process.env.ADMIN_PASS || '123';
+
+        if (id === ADMIN_ID && password === ADMIN_PASS) {
+            const token = jwt.sign(
+                { childname: 'Super Admin', isSuperAdmin: true },
+                process.env.JWT_SECRET || 'fallback_secret',
+                { expiresIn: '8h' }
+            );
+            return res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' })
+                      .json({ message: "Super Admin access granted", child: { childname: 'Super Admin', isSuperAdmin: true } });
+        } else {
+            return res.status(401).json({ error: "Incorrect Admin ID or Password" });
+        }
+    } catch (error) {
+        console.error("Admin login error:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
 const registerChild = async (req, res) => {
     try {
         const { childname, password } = req.body;
@@ -77,4 +102,4 @@ const logoutChild = async (req, res) => {
     res.json({ message: 'Logged out' });
 };
 
-module.exports = { test, registerChild, loginChild, getProfile, logoutChild };
+module.exports = { test, registerChild, loginChild, getProfile, logoutChild, adminLogin };

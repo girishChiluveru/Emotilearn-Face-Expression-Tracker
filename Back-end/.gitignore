@@ -1,5 +1,6 @@
 photos/
-node_modules/
 .env
-.agents/
 skills-lock.json
+.agents
+node_modules/
+*.md

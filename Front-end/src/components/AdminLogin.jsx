@@ -2,6 +2,7 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldCheck, User, Lock, AlertCircle, Loader2 } from 'lucide-react';
+import axios from 'axios';
 import { UserContext } from '../../context/userContext';
 import '../styles/ChildLogin.css';
 
@@ -9,18 +10,12 @@ import '../styles/ChildLogin.css';
  * AdminLogin — Super Admin authentication.
  *
  * ⚠️  SECURITY NOTE (Production):
- * Credentials are read from Vite env vars so they are NOT visible in source
- * code, but they are still bundled into the client JS.
- * For a real production build, replace this with a backend API call:
- *   POST /admin/login  →  returns a signed JWT with isSuperAdmin: true
- *
- * To set credentials:  create Front-end/.env.local
- *   VITE_ADMIN_ID=your_secure_id
- *   VITE_ADMIN_PASS=your_secure_password
+ * Credentials are no longer checked on the frontend.
+ * This component now makes a POST request to /admin/login.
+ * To set credentials for the backend, update Back-end/.env:
+ *   ADMIN_ID=your_secure_id
+ *   ADMIN_PASS=your_secure_password
  */
-const ADMIN_ID   = import.meta.env.VITE_ADMIN_ID   ?? '123';
-const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS ?? '123';
-
 const AdminLogin = () => {
   const navigate = useNavigate();
   const { setChild } = useContext(UserContext);
@@ -28,23 +23,26 @@ const AdminLogin = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    // Simulate async check for consistent UX
-    setTimeout(() => {
-      if (data.id === ADMIN_ID && data.password === ADMIN_PASS) {
-        const superUser = { childname: 'Super Admin', isSuperAdmin: true };
+    try {
+      const res = await axios.post('/admin/login', data);
+      if (res.data.error) {
+        setError(res.data.error);
+      } else {
+        const superUser = res.data.child;
         setChild(superUser);
         localStorage.setItem('emotilearn_super', JSON.stringify(superUser));
         navigate('/super-admin');
-      } else {
-        setError('Incorrect Admin ID or Password.');
       }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Something went wrong.');
+    } finally {
       setLoading(false);
-    }, 400);
+    }
   };
 
   const update = (k, v) => { setData({ ...data, [k]: v }); setError(''); };
