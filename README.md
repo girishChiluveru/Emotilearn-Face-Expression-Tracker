@@ -2,13 +2,13 @@
 
 ## 🎯 Project Overview
 
-**Emotilearn** is a full-stack web application that combines artificial intelligence with educational gaming to support dyslexic children's learning journey. The system leverages **real-time facial emotion recognition** to detect emotional states (frustration, confusion, engagement) while children participate in educational games, providing teachers and parents with actionable insights for personalized learning support.
+**Emotilearn** is a full-stack web application that combines artificial intelligence with educational gaming to support dyslexic children's learning journey. The system leverages **real-time facial emotion recognition** to detect emotional states (frustration, confusion, engagement) while children participate in educational games, providing therapist with actionable insights for personalized learning support.
 
 ### Core Value Proposition
 
 - 📊 **Real-time emotion tracking** during educational activities
 - 🎮 **Gamified learning experiences** (Quiz, Memory Game, Animal Game)
-- 📈 **Data-driven progress reports** for teachers and parents
+- 📈 **Data-driven progress reports** for therapists
 - 🤖 **AI-powered adaptive feedback** based on emotional patterns
 
 ---
@@ -20,7 +20,7 @@
 │  Frontend (React + Vite)                                        │
 │  - Child login & game interfaces                                │
 │  - Real-time webcam + emotion visualization                     │
-│  - Teacher/Parent dashboards with analytics                     │
+│  - Therapist dashboards with analytics                     │
 └────────────────────┬────────────────────────────────────────────┘
                      │ WebSocket (Socket.io) + REST API
 ┌────────────────────▼────────────────────────────────────────────┐
@@ -77,7 +77,7 @@ For detailed deployment architecture, see [DEPLOYMENT_ARCHITECTURE.md](DEPLOYMEN
 
 - Per-session emotion analysis (happy, sad, angry, neutral, fearful, disgusted)
 - Emotion events linked to specific questions/game rounds
-- Teacher/Parent dashboards with charts and progress reports
+- Therapist dashboards with charts and progress reports
 
 ✅ **Admin Controls**
 
@@ -191,22 +191,7 @@ Emotilearn-Face-Expression-Tracker/
 
 ---
 
-## 🔐 Security Considerations
 
-⚠️ **Before Production Deployment:**
-
-- [ ] Change default admin credentials in environment variables
-- [ ] Use strong JWT secrets (32+ character random string)
-- [ ] Enable HTTPS/SSL certificates
-- [ ] Set up database backups and monitoring
-- [ ] Implement rate limiting on all endpoints
-- [ ] Use AWS Secrets Manager for sensitive data
-- [ ] Enable VPC security groups and network ACLs
-- [ ] Add Web Application Firewall (WAF)
-
-See [DEPLOYMENT_ARCHITECTURE.md](DEPLOYMENT_ARCHITECTURE.md#security-checklist) for production security setup.
-
----
 
 ## 📊 Data Models
 
@@ -326,7 +311,7 @@ AI_SERVICE_URL=http://localhost:8000
 
 ## 📚 Documentation
 
-- [DEPLOYMENT_ARCHITECTURE.md](DEPLOYMENT_ARCHITECTURE.md) - Production deployment guide
+
 - [QUICK_START_GUIDE.md](QUICK_START_GUIDE.md) - Quick reference for development
 - [Explain.md](Explain.md) - Detailed codebase breakdown
 
