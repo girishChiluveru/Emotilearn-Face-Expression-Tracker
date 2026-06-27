@@ -35,8 +35,21 @@ function registerEmotionSocket(io) {
   // ── Socket.io middleware for JWT verification ─────────────────────────────
   io.use((socket, next) => {
     try {
-      // Get token from query, auth header, or handshake
-      let token = socket.handshake.query.token || 
+      // Parse token from cookies
+      let tokenFromCookie = null;
+      const cookieHeader = socket.handshake.headers.cookie;
+      if (cookieHeader) {
+        const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
+          const [key, ...valParts] = cookie.split('=');
+          if (key) acc[key.trim()] = valParts.join('=').trim();
+          return acc;
+        }, {});
+        tokenFromCookie = cookies['token'];
+      }
+
+      // Get token from cookie, query, auth header, or handshake
+      let token = tokenFromCookie ||
+                  socket.handshake.query.token || 
                   socket.handshake.headers.authorization?.replace('Bearer ', '') ||
                   socket.handshake.auth.token;
 
@@ -163,6 +176,7 @@ function registerEmotionSocket(io) {
         return;
       }
 
+
       // ── Call FastAPI Inference Service ────────────────────────────────────
       let emotion, probabilities;
       try {
@@ -188,6 +202,8 @@ function registerEmotionSocket(io) {
         if (!emotion || !probabilities) {
           throw new Error('Invalid response from AI service');
         }
+        
+
       } catch (err) {
         console.error('[emotionSocket] AI Service error:', err.message);
         socket.emit('emotion_error', {

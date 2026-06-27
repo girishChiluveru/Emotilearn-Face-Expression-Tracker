@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import EmotionTracker from './EmotionTracker';
-import { useEmotionBackground } from '../hooks/useEmotionBackground';
 import { Trophy, Star, RotateCcw } from 'lucide-react';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
@@ -14,7 +13,6 @@ const EMOJI_PAIRS = ['🍎','🦁','🌟','🎮','🌈','🎯','🧠','❤️'];
 
 function MemoryGame({ onFinish, childname, sessionId }) {
   const navigate = useNavigate();
-  const { setEmotion } = useEmotionBackground();
   const { width, height } = useWindowSize();
 
   const [grid, setGrid]           = useState([]);
@@ -70,7 +68,6 @@ function MemoryGame({ onFinish, childname, sessionId }) {
         sessionId={sessionId}
         gameId={GAME_ID}
         qid={`pair-${matched.length}`}
-        onEmotion={setEmotion}
       />
 
       <div className="w-full max-w-lg">

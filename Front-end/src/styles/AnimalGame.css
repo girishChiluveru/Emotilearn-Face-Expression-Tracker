@@ -1,59 +1,97 @@
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f0f8ff;
-  }
-  
-  .game-container {
-    text-align: center;
-    color: #333;
-  }
-  
-  h1 {
-    font-size: 2rem;
-    color: #ff6347;
-  }
-  
-  p {
-    font-size: 1.2rem;
-    color: #333;
-  }
-  
-  .game-area {
-    position: relative;
-    width: 400px;
-    height: 500px;
-    background-color: #e6f7ff;
-    overflow: hidden;
-    border: 2px solid #333;
-    margin: 0 auto;
-    border-radius: 10px;
-  }
-  
-  .animal {
-    position: absolute;
-    font-size: 2.5rem;
-    transition: top 0.1s;
-  }
-  
-  .letter {
-    position: absolute;
-    font-size: 1.8rem;
-    color: #1e90ff;
-    background-color: #fff;
-    border: 2px solid #1e90ff;
-    padding: 0.3rem;
-    border-radius: 5px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .instructions {
-    margin-top: 10px;
-    font-size: 1rem;
-    color: #555;
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  font-family: 'Nunito', sans-serif;
+}
+
+.animal-game-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+}
+
+.animal-game__card {
+  border-radius: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.animal-game__title {
+  color: #2d3748;
+}
+
+.game-area {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  height: 420px;
+  background: linear-gradient(to bottom, #ebf8ff 0%, #f0f9ff 100%);
+  overflow: hidden;
+  border: 3px solid #cbd5e0;
+  margin: 0 auto;
+  border-radius: 16px;
+  box-shadow: inset 0 4px 10px rgba(0,0,0,0.03);
+}
+
+/* Horizontal lane divider markings */
+.lane-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-top: 2px dashed #cbd5e0;
+  opacity: 0.5;
+  z-index: 1;
+}
+
+.animal {
+  position: absolute;
+  font-size: 2.8rem;
+  z-index: 5;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateY(-10px);
+  transition: top 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.letter {
+  position: absolute;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #3182ce;
+  background-color: #ffffff;
+  border: 3px solid #3182ce;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(49, 130, 206, 0.15);
+  transform: translateY(-8px);
+  z-index: 4;
+}
+
+.instructions {
+  font-size: 0.95rem;
+  color: #718096;
+}
+
+/* Pulse animation for active elements */
+@keyframes pulseGentle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.animate-pulse-gentle {
+  animation: pulseGentle 2s infinite ease-in-out;
+}

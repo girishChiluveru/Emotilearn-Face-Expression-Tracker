@@ -131,7 +131,7 @@ const authLimiter = rateLimit({
   message: 'Too many login attempts, please try again after 15 minutes',
   skipSuccessfulRequests: true,
   keyGenerator: (req) => req.body?.childname || req.ip,
-  validate: { keyGenerator: false },
+  validate: false,
 });
 
 app.use(generalLimiter);

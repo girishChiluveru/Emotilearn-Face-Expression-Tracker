@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Question from './Question';
 import { questions } from '../data/questions';
 import EmotionTracker from './EmotionTracker';
-import { useEmotionBackground } from '../hooks/useEmotionBackground';
+import { UserContext } from '../../context/userContext';
 import { Timer, ChevronRight, Camera, Trophy } from 'lucide-react';
 import '../styles/Quiz.css';
 
@@ -16,7 +16,7 @@ const LABELS = {
 
 const Quiz = ({ onQuizEnd, childname, sessionId }) => {
   const navigate = useNavigate();
-  const { setEmotion, currentEmotion } = useEmotionBackground();
+  const { currentEmotion } = useContext(UserContext);
 
   const [started, setStarted] = useState(false);
   const [qi, setQi] = useState(0);
@@ -73,7 +73,7 @@ const Quiz = ({ onQuizEnd, childname, sessionId }) => {
 
   return (
     <div className="quiz-page">
-      <EmotionTracker childname={childname} sessionId={sessionId} gameId="quiz" qid={`q${qi + 1}`} onEmotion={setEmotion} />
+      <EmotionTracker childname={childname} sessionId={sessionId} gameId="quiz" qid={`q${qi + 1}`} />
 
       <div className="quiz-page__content">
         {/* Status bar */}

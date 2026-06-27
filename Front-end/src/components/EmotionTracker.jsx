@@ -20,11 +20,12 @@
  *   onEmotion   {function} - (emotion: string, probabilities: object) => void
  */
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { io } from 'socket.io-client';
 import { FaceMesh } from '@mediapipe/face_mesh';
 import { Camera } from '@mediapipe/camera_utils';
+import { UserContext } from '../../context/userContext';
 
 const WS_URL = import.meta.env.VITE_WS_URL || 'http://localhost:3000';
 const EMIT_INTERVAL_MS = 600; // throttle: one emotion sample every 600ms
@@ -38,8 +39,17 @@ const EmotionTracker = ({ childname, sessionId, gameId, qid, onEmotion }) => {
     const qidRef        = useRef(qid);
     const gameIdRef     = useRef(gameId);
 
+    const { setCurrentEmotion } = useContext(UserContext);
+
     useEffect(() => { qidRef.current = qid; }, [qid]);
     useEffect(() => { gameIdRef.current = gameId; }, [gameId]);
+
+    // Cleanup background emotion on unmount
+    useEffect(() => {
+        return () => {
+            if (setCurrentEmotion) setCurrentEmotion('neutral');
+        };
+    }, [setCurrentEmotion]);
 
     // ── Socket.io connection ─────────────────────────────────────────────────
     useEffect(() => {
@@ -56,6 +66,7 @@ const EmotionTracker = ({ childname, sessionId, gameId, qid, onEmotion }) => {
         });
 
         socket.on('emotion_result', ({ emotion, probabilities }) => {
+            if (setCurrentEmotion) setCurrentEmotion(emotion);
             if (onEmotion) onEmotion(emotion, probabilities);
         });
 
@@ -73,14 +84,16 @@ const EmotionTracker = ({ childname, sessionId, gameId, qid, onEmotion }) => {
             socket.disconnect();
             socketRef.current = null;
         };
-    }, [childname, sessionId]);
+    }, [childname, sessionId, setCurrentEmotion]);
 
     // ── MediaPipe FaceMesh ───────────────────────────────────────────────────
     const onResults = useCallback((results) => {
-        if (!results.multiFaceLandmarks?.length) return;
+        const now = Date.now();
+        const hasFace = !!results.multiFaceLandmarks?.length;
+        
+        if (!hasFace) return;
         if (!socketRef.current?.connected) return;
 
-        const now = Date.now();
         if (now - lastEmitRef.current < EMIT_INTERVAL_MS) return;
         lastEmitRef.current = now;
 
@@ -112,13 +125,16 @@ const EmotionTracker = ({ childname, sessionId, gameId, qid, onEmotion }) => {
 
         const camera = new Camera(videoRef.current, {
             onFrame: async () => {
-                await faceMesh.send({ image: videoRef.current });
+                if (videoRef.current) {
+                    await faceMesh.send({ image: videoRef.current });
+                }
             },
             width: 640,
             height: 480,
         });
 
-        camera.start();
+        camera.start().catch((err) => console.error('[MediaPipe] ❌ Camera stream failed to start:', err));
+            
         cameraRef.current = camera;
 
         return () => {
