@@ -33,13 +33,14 @@ const AdminLogin = () => {
       if (res.data.error) {
         setError(res.data.error);
       } else {
-        const superUser = res.data.child;
+        const superUser = { ...res.data.user, isSuperAdmin: true };
         setChild(superUser);
         localStorage.setItem('emotilearn_super', JSON.stringify(superUser));
         navigate('/super-admin');
       }
     } catch (err) {
-      setError(err.response?.data?.error || 'Something went wrong.');
+      const msg = err.response?.data?.details?.[0]?.message || err.response?.data?.message || err.response?.data?.error || 'Something went wrong.';
+      setError(msg);
     } finally {
       setLoading(false);
     }

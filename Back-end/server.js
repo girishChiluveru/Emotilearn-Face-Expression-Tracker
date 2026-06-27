@@ -131,9 +131,35 @@ const authLimiter = rateLimit({
   message: 'Too many login attempts, please try again after 15 minutes',
   skipSuccessfulRequests: true,
   keyGenerator: (req) => req.body?.childname || req.ip,
+  validate: { keyGenerator: false },
 });
 
 app.use(generalLimiter);
+
+// ── Request Logging Middleware (Development/Debug) ──────────────────────────
+if (process.env.NODE_ENV === 'development' || process.env.DEBUG === 'true') {
+  app.use((req, res, next) => {
+    const start = Date.now();
+    const { method, url, body } = req;
+
+    // Sanitize body to avoid logging plain text passwords
+    const sanitizedBody = { ...body };
+    if (sanitizedBody.password) sanitizedBody.password = '[REDACTED]';
+    if (sanitizedBody.adminPassword) sanitizedBody.adminPassword = '[REDACTED]';
+
+    console.log(`[REQUEST] ${new Date().toISOString()} | ${method} ${url} | IP: ${req.ip}`);
+    if (Object.keys(sanitizedBody).length) {
+      console.log(`[REQUEST BODY]`, JSON.stringify(sanitizedBody, null, 2));
+    }
+
+    res.on('finish', () => {
+      const duration = Date.now() - start;
+      console.log(`[RESPONSE] ${method} ${url} | Status: ${res.statusCode} | Duration: ${duration}ms`);
+    });
+
+    next();
+  });
+}
 
 // ── CSRF Protection ──────────────────────────────────────────────────────────
 app.use(csrfTokenMiddleware);
@@ -239,32 +265,11 @@ app.get('/reports/report/:childname', authMiddleware,
   }),
 );
 
+// Mount reportRoutes to expose specific session details (GET /reports/:childName/:sessionID)
+app.use('/reports', authMiddleware, reportRoutes);
+
 // ── Store Scores ──────────────────────────────────────────────────────────────
-app.post(
-  '/store-scores',
-  authMiddleware,
-  validateRequest(storeScoresSchema, 'body'),
-  idempotencyMiddleware,
-  invalidateCacheMiddleware,
-  csrfVerifyMiddleware,
-  asyncHandler(async (req, res) => {
-    const { sessionId, gameType, score, duration } = req.body;
-
-    const report = await Report.findOne({ 'sessions.sessionId': sessionId });
-    if (!report) {
-      return res.status(404).json({ error: 'Session not found' });
-    }
-
-    const session = report.sessions.id(sessionId);
-    session.scores.push({ gameType, score });
-
-    await report.save();
-    res.json({
-      message: 'Score stored successfully',
-      score: { gameType, score },
-    });
-  }),
-);
+app.use('/store-scores', authMiddleware, csrfVerifyMiddleware, storeScoresRoutes);
 
 // ── Children Management (Admin only) ──────────────────────────────────────────
 app.get(
@@ -353,7 +358,7 @@ app.get(
   adminOnlyMiddleware,
   cacheMiddleware(300),
   asyncHandler(async (req, res) => {
-    const admins = await Admin.find({}, '-password');
+    const admins = await Admin.find({});
     res.json(admins);
   }),
 );
@@ -367,12 +372,35 @@ app.post(
   requireIdempotencyKey,
   idempotencyMiddleware,
   asyncHandler(async (req, res) => {
+    const { name } = req.body;
+    if (!name) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        message: 'Admin name is required',
+      });
+    }
+
+    // Check if name is already taken by an admin
+    const existingAdmin = await Admin.findOne({ name });
+    if (existingAdmin) {
+      return res.status(409).json({
+        error: 'Conflict',
+        message: 'Admin name already exists',
+      });
+    }
+
+    // Check if name is already taken by a child
+    const existingChild = await Report.findOne({ childname: name });
+    if (existingChild) {
+      return res.status(409).json({
+        error: 'Conflict',
+        message: 'Name is already taken by a child',
+      });
+    }
+
     const newAdmin = new Admin(req.body);
     await newAdmin.save();
-    res.status(201).json({
-      message: 'Admin created successfully',
-      admin: newAdmin.name,
-    });
+    res.status(201).json(newAdmin);
   }),
 );
 

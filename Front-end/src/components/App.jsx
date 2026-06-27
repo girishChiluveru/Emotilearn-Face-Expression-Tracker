@@ -23,6 +23,27 @@ import '../styles/App.css';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 axios.defaults.baseURL = API_URL;
 axios.defaults.withCredentials = true;
+axios.defaults.xsrfCookieName = '__csrf_token';
+axios.defaults.xsrfHeaderName = 'X-CSRF-Token';
+
+// Interceptor to generate and attach an Idempotency-Key for state-changing requests
+axios.interceptors.request.use(
+  (config) => {
+    const method = config.method?.toLowerCase();
+    if (['post', 'put', 'delete', 'patch'].includes(method)) {
+      if (!config.headers['Idempotency-Key']) {
+        const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+          const r = (Math.random() * 16) | 0;
+          const v = c === 'x' ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
+        config.headers['Idempotency-Key'] = uuid;
+      }
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 /** Redirect already-logged-in users away from auth pages */
 const PublicRoute = ({ children }) => {
@@ -38,12 +59,21 @@ const ProtectedRoute = ({ children }) => {
   return child ? children : <Navigate to="/login" replace />;
 };
 
-/** Require super-admin session — children & unauthenticated users are redirected */
-const AdminRoute = ({ children }) => {
+/** Require super-admin session — regular admins, children & unauthenticated users are redirected */
+const SuperAdminRoute = ({ children }) => {
   const { child, ready } = useContext(UserContext);
   if (!ready) return null;
   if (!child) return <Navigate to="/login" replace />;
   if (!child.isSuperAdmin) return <Navigate to="/game-select" replace />;
+  return children;
+};
+
+/** Require admin or super-admin session (therapists/admins) */
+const AdminRoute = ({ children }) => {
+  const { child, ready } = useContext(UserContext);
+  if (!ready) return null;
+  if (!child) return <Navigate to="/login" replace />;
+  if (!child.isAdmin && !child.isSuperAdmin) return <Navigate to="/game-select" replace />;
   return children;
 };
 
@@ -68,17 +98,11 @@ function App() {
   const postScores = async (scores) => {
     if (!resolved.name || !resolved.session) return;
     try {
-      const r = await fetch(`${API_URL}/store-scores`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          childName: resolved.name,
-          sessionId: resolved.session,
-          scores,
-        }),
+      await axios.post('/store-scores', {
+        childName: resolved.name,
+        sessionId: resolved.session,
+        scores,
       });
-      if (!r.ok) throw new Error(r.statusText);
     } catch (e) {
       console.error('postScores failed:', e);
     }
@@ -105,10 +129,10 @@ function App() {
         <Route path="/animal-game" element={<ProtectedRoute><AnimalGame  childname={resolved.name} sessionId={resolved.session} onanimal={(s)    => postScores([{ gameType: 'Animal Game', score: s }])} /></ProtectedRoute>} />
         <Route path="/memory-game" element={<ProtectedRoute><MemoryGame  childname={resolved.name} sessionId={resolved.session} onFinish={(s)   => postScores([{ gameType: 'Memory Game', score: s }])} /></ProtectedRoute>} />
 
-        {/* Reports & Admin — super-admin only */}
+        {/* Reports & Admin — therapists can view report pages, super admin can view all */}
         <Route path="/report"       element={<AdminRoute>{withNav(<Report />)}</AdminRoute>} />
         <Route path="/child-report" element={<AdminRoute>{withNav(<ChildReport />)}</AdminRoute>} />
-        <Route path="/super-admin"  element={<AdminRoute>{withNav(<SuperAdmin />)}</AdminRoute>} />
+        <Route path="/super-admin"  element={<SuperAdminRoute>{withNav(<SuperAdmin />)}</SuperAdminRoute>} />
 
         {/* Public pages */}
         <Route path="/Faqs" element={<Faqs />} />

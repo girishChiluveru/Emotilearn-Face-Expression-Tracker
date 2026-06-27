@@ -12,7 +12,7 @@ async function handleReport(req, res) {
         ).lean();
 
         if (!reports || reports.length === 0) {
-            return res.status(404).json({ error: 'No reports found.' });
+            return res.status(200).json([]);
         }
 
         // Shape data for the frontend charts

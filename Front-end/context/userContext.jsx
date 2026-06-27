@@ -20,7 +20,7 @@ export function UserContextProvider({ children }) {
 
         // 2. Regular child/therapist — validate via backend session cookie
         const { data } = await axios.get('/profile');
-        setChild(data || null);
+        setChild(data?.user || null);
       } catch {
         setChild(null);
       } finally {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Table, Button, Form } from "react-bootstrap";
+import { toast } from "react-hot-toast";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function SuperAdmin() {
@@ -12,12 +13,12 @@ function SuperAdmin() {
     // Fetch all children and admins
     useEffect(() => {
         axios
-            .get("http://localhost:3000/children")
+            .get("/children")
             .then((res) => setChildren(res.data))
             .catch((err) => console.error(err));
 
         axios
-            .get("http://localhost:3000/admins")
+            .get("/admins")
             .then((res) => setAdmins(res.data))
             .catch((err) => console.error(err));
     }, []);
@@ -25,30 +26,42 @@ function SuperAdmin() {
     // Delete a child
     const deleteChild = (id) => {
         axios
-            .delete(`http://localhost:3000/children/${id}`)
-            .then(() => setChildren(children.filter((child) => child._id !== id)))
-            .catch((err) => console.error(err));
+            .delete(`/children/${id}`)
+            .then(() => {
+                setChildren(children.filter((child) => child._id !== id));
+                toast.success("Child deleted successfully!");
+            })
+            .catch((err) => {
+                console.error(err);
+                toast.error("Failed to delete child.");
+            });
     };
 
     // Delete an admin
     const deleteAdmin = (id) => {
         axios
-            .delete(`http://localhost:3000/admins/${id}`)
-            .then(() => setAdmins(admins.filter((admin) => admin._id !== id)))
-            .catch((err) => console.error(err));
+            .delete(`/admins/${id}`)
+            .then(() => {
+                setAdmins(admins.filter((admin) => admin._id !== id));
+                toast.success("Admin deleted successfully!");
+            })
+            .catch((err) => {
+                console.error(err);
+                toast.error("Failed to delete admin.");
+            });
     };
 
     // Toggle isProcessed for a session
     const toggleIsProcessed = (childId, sessionId, isProcessed) => {
         axios
-            .patch(`http://localhost:3000/sessions/${childId}/${sessionId}`, {
+            .patch(`/sessions/${childId}/${sessionId}`, {
                 isProcessed: !isProcessed,
             })
             .then(() => {
                 const updatedChildren = children.map((child) => {
                     if (child._id === childId) {
                         child.sessions = child.sessions.map((session) =>
-                            session._id === sessionId
+                            session.sessionId === sessionId
                                 ? { ...session, isProcessed: !isProcessed }
                                 : session
                         );
@@ -56,19 +69,28 @@ function SuperAdmin() {
                     return child;
                 });
                 setChildren(updatedChildren);
+                toast.success("Session status updated!");
             })
-            .catch((err) => console.error(err));
+            .catch((err) => {
+                console.error(err);
+                toast.error("Failed to update session status.");
+            });
     };
 
     // Add a new admin
     const addAdmin = () => {
         axios
-            .post("http://localhost:3000/admins", newAdmin)
+            .post("/admins", newAdmin)
             .then((res) => {
                 setAdmins([...admins, res.data]);
                 setNewAdmin({ name: "", password: "" }); // Reset the form
+                toast.success("Admin added successfully!");
             })
-            .catch((err) => console.error(err));
+            .catch((err) => {
+                console.error(err);
+                const msg = err.response?.data?.details?.[0]?.message || err.response?.data?.message || err.response?.data?.error || 'Failed to add admin.';
+                toast.error(msg);
+            });
     };
 
     return (
@@ -112,12 +134,12 @@ function SuperAdmin() {
                                 <td>{child.password}</td>
                                 <td>
                                     {child.sessions.map((session) => (
-                                        <div key={session._id}>{session.sessionId}</div>
+                                        <div key={session.sessionId}>{session.sessionId}</div>
                                     ))}
                                 </td>
                                 <td>
                                     {child.sessions.map((session) => (
-                                        <div key={session._id}>
+                                        <div key={session.sessionId}>
                                             <Button
                                                 variant={
                                                     session.isProcessed
@@ -128,7 +150,7 @@ function SuperAdmin() {
                                                 onClick={() =>
                                                     toggleIsProcessed(
                                                         child._id,
-                                                        session._id,
+                                                        session.sessionId,
                                                         session.isProcessed
                                                     )
                                                 }

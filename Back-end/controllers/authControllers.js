@@ -30,13 +30,14 @@ const adminLogin = async (req, res) => {
           id: 'admin-001',
           childname: 'Super Admin',
           isAdmin: true,
+          isSuperAdmin: true,
           email: ADMIN_ID,
         });
 
         res.cookie('token', token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          sameSite: 'strict',
+          sameSite: 'lax',
           maxAge: 24 * 60 * 60 * 1000, // 24 hours
         });
 
@@ -47,6 +48,7 @@ const adminLogin = async (req, res) => {
             id: 'admin-001',
             childname: 'Super Admin',
             isAdmin: true,
+            isSuperAdmin: true,
           },
         });
       }
@@ -61,8 +63,8 @@ const adminLogin = async (req, res) => {
       });
     }
 
-    // Verify password
-    const isMatch = await compareP(password, admin.password);
+    // Verify password (plain text comparison)
+    const isMatch = (password === admin.password);
     if (!isMatch) {
       return res.status(401).json({
         error: 'Unauthorized',
@@ -81,7 +83,7 @@ const adminLogin = async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -112,12 +114,21 @@ const registerChild = async (req, res) => {
   try {
     const { childname, password } = req.body;
 
-    // Check if child already exists
+    // Check if name is already taken by a child
     const existingChild = await Report.findOne({ childname });
     if (existingChild) {
       return res.status(409).json({
         error: 'Conflict',
-        message: 'Name already taken',
+        message: 'Name already taken by a child',
+      });
+    }
+
+    // Check if name is already taken by an admin
+    const existingAdmin = await Admin.findOne({ name: childname });
+    if (existingAdmin) {
+      return res.status(409).json({
+        error: 'Conflict',
+        message: 'Name is already taken by an admin',
       });
     }
 
@@ -141,7 +152,7 @@ const registerChild = async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -176,7 +187,7 @@ const loginChild = async (req, res) => {
     // Check if admin user
     const admin = await Admin.findOne({ name: childname });
     if (admin) {
-      const isMatch = await compareP(password, admin.password);
+      const isMatch = (password === admin.password);
       if (!isMatch) {
         return res.status(401).json({
           error: 'Unauthorized',
@@ -193,7 +204,7 @@ const loginChild = async (req, res) => {
       res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'lax',
         maxAge: 24 * 60 * 60 * 1000,
       });
 
@@ -247,7 +258,7 @@ const loginChild = async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -312,7 +323,7 @@ const refreshTokenEndpoint = (req, res) => {
   res.cookie('token', newToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: 'lax',
     maxAge: 24 * 60 * 60 * 1000,
   });
 
@@ -333,14 +344,14 @@ const logoutChild = async (req, res) => {
     res.clearCookie('token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
     });
 
     // Invalidate session in database if needed
     if (req.user?.sessionId) {
       const child = await Report.findById(req.user.id);
       if (child) {
-        const session = child.sessions.id(req.user.sessionId);
+        const session = child.sessions.find(s => s.sessionId === req.user.sessionId);
         if (session) {
           session.logoutTime = new Date();
         }

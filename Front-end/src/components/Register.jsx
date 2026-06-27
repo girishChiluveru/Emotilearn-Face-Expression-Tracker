@@ -25,7 +25,8 @@ const ChildRegister = () => {
         navigate('/login');
       }
     } catch (err) {
-      setError(err.response?.data?.error || 'An error occurred.');
+      const msg = err.response?.data?.details?.[0]?.message || err.response?.data?.message || err.response?.data?.error || 'An error occurred.';
+      setError(msg);
     } finally { setLoading(false); }
   };
 

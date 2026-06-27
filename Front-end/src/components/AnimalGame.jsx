@@ -82,7 +82,7 @@ function AnimalGame({ onanimal, childname, sessionId }) {
           }
         } else {
           onanimal(score);
-          navigate('/memory-game');
+          navigate('/game-select');
         }
       }
     });
@@ -109,7 +109,7 @@ function AnimalGame({ onanimal, childname, sessionId }) {
       </h2>
 
       {gameOver ? (
-        <button onClick={() => navigate('/memory-game')}>Next Game</button>
+        <button onClick={() => navigate('/game-select')}>Go to Games</button>
       ) : (
         <div className="game-area">
           <div className="animal" style={{ left: position.x, top: position.y }}>

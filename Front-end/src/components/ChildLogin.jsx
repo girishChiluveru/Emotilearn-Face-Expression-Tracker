@@ -24,13 +24,15 @@ const ChildLogin = ({ onStartQuiz }) => {
       const res = await axios.post('/login', data);
       if (res.data.error) { setError(res.data.error); }
       else {
-        setChild(res.data);
-        if (res.data.isAdmin) navigate('/report');
-        else { onStartQuiz(data.childname, res.data.sessionId); navigate('/game-select'); }
+        const loggedInUser = res.data.user;
+        setChild(loggedInUser);
+        if (loggedInUser.isAdmin) navigate('/report');
+        else { onStartQuiz(loggedInUser.childname, loggedInUser.sessionId); navigate('/game-select'); }
         setData({ childname: '', password: '' });
       }
     } catch (err) {
-      setError(err.response?.data?.error || 'Something went wrong.');
+      const msg = err.response?.data?.details?.[0]?.message || err.response?.data?.message || err.response?.data?.error || 'Something went wrong.';
+      setError(msg);
     } finally { setLoading(false); }
   };
 

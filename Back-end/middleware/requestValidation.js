@@ -99,33 +99,39 @@ const emotionEventSchema = Joi.object({
 }).unknown(false);
 
 const storeScoresSchema = Joi.object({
+  childName: Joi.string()
+    .required()
+    .messages({
+      'string.empty': 'Child name is required',
+    }),
   sessionId: Joi.string()
     .uuid()
     .required()
     .messages({
       'string.guid': 'Invalid session ID format',
     }),
-  gameType: Joi.string()
-    .valid('quiz', 'memory', 'animal')
+  scores: Joi.array()
+    .items(
+      Joi.object({
+        gameType: Joi.string()
+          .valid('Quiz Game', 'Memory Game', 'Animal Game')
+          .required()
+          .messages({
+            'any.only': 'Game type must be one of: Quiz Game, Memory Game, Animal Game',
+          }),
+        score: Joi.number()
+          .integer()
+          .min(0)
+          .max(10000)
+          .required()
+          .messages({
+            'number.max': 'Score cannot exceed 10000',
+          }),
+      })
+    )
     .required()
     .messages({
-      'any.only': 'Game type must be one of: quiz, memory, animal',
-    }),
-  score: Joi.number()
-    .integer()
-    .min(0)
-    .max(10000)
-    .required()
-    .messages({
-      'number.max': 'Score cannot exceed 10000',
-    }),
-  duration: Joi.number()
-    .integer()
-    .min(1)
-    .max(3600)
-    .optional()
-    .messages({
-      'number.max': 'Duration cannot exceed 1 hour (3600 seconds)',
+      'array.base': 'Scores must be an array',
     }),
 }).unknown(false);
 

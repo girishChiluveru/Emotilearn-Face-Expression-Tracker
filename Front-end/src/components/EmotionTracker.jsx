@@ -98,8 +98,7 @@ const EmotionTracker = ({ childname, sessionId, gameId, qid, onEmotion }) => {
         if (!videoRef.current) return;
 
         const faceMesh = new FaceMesh({
-            locateFile: (file) =>
-                `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/${file}`,
+            locateFile: (file) => `/face_mesh/${file}`,
         });
 
         faceMesh.setOptions({

@@ -29,7 +29,7 @@ function csrfTokenMiddleware(req, res, next) {
     res.cookie(CSRF_COOKIE_NAME, token, {
       httpOnly: false, // Must be accessible to client JS
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     });
     res.locals.csrfToken = token;
@@ -47,6 +47,11 @@ function csrfTokenMiddleware(req, res, next) {
 function csrfVerifyMiddleware(req, res, next) {
   // Skip verification for GET, HEAD, OPTIONS
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+    return next();
+  }
+
+  // Skip CSRF verification in local development
+  if (process.env.NODE_ENV === 'development') {
     return next();
   }
 
@@ -88,7 +93,7 @@ function getCsrfTokenRoute(req, res) {
   res.cookie(CSRF_COOKIE_NAME, token, {
     httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: 'lax',
     maxAge: 24 * 60 * 60 * 1000,
   });
 

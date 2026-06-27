@@ -2,9 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, FileText, AlertTriangle, X, Loader2, BarChart3 } from 'lucide-react';
+import axios from 'axios';
 import '../styles/Report.css';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const ReportsTable = () => {
   const navigate = useNavigate();
@@ -18,11 +17,9 @@ const ReportsTable = () => {
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/reports`, { credentials: 'include' });
-      if (!response.ok) throw new Error(`Status ${response.status}`);
-      const data = await response.json();
-      setReports(data);
-      setFiltered(data);
+      const response = await axios.get('/reports');
+      setReports(response.data);
+      setFiltered(response.data);
     } catch (err) {
       console.error('Error fetching reports:', err);
       setModalMessage('Error fetching reports. Please try again later.');
