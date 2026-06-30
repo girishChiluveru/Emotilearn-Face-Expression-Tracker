@@ -2,7 +2,7 @@ const Admin = require('../models/Admin');
 const Report = require('../models/report');
 const { hashP, compareP } = require('../bcrypt/authCrypt');
 const { generateToken, refreshToken } = require('../utils/jwtUtils');
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 
 /**
  * Test endpoint - indicates server is running
@@ -238,7 +238,7 @@ const loginChild = async (req, res) => {
     }
 
     // Create session
-    const sessionId = uuidv4();
+    const sessionId = crypto.randomUUID();
     const loginTime = new Date();
     child.sessions.push({
       sessionId,
