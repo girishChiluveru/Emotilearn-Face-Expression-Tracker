@@ -416,8 +416,6 @@ app.delete(
   }),
 );
 
-// ── Static Files ──────────────────────────────────────────────────────────────
-app.use('/photos', express.static(path.join(__dirname, 'photos')));
 
 // ── 404 Handler ───────────────────────────────────────────────────────────────
 app.use(notFoundHandler);

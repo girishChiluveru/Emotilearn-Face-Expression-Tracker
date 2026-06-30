@@ -1,2 +1,18 @@
-md/*
+# System & Env Files
 .env
+md/*
+
+# Docker Compose
+docker-compose.yml
+
+# Terraform files
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.tfvars.json
+.terraform.lock.hcl
+*.pem
+# Local deployment docs
+deployment_guide.md
+walkthrough.md

@@ -13,7 +13,12 @@ resource "aws_internet_gateway" "igw" {
   tags = { Name = "${var.environment}-igw" }
 }
 
-# Public Subnets
+# Fetch availability zones in the current region
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
+# Public Subnets (2 subnets for high availability)
 resource "aws_subnet" "public" {
   count                   = 2
   vpc_id                  = aws_vpc.main.id
@@ -23,7 +28,7 @@ resource "aws_subnet" "public" {
   tags = { Name = "${var.environment}-public-${count.index}" }
 }
 
-# Private Subnets
+# Private Subnets (2 subnets for database / backend servers)
 resource "aws_subnet" "private" {
   count             = 2
   vpc_id            = aws_vpc.main.id
@@ -32,24 +37,27 @@ resource "aws_subnet" "private" {
   tags = { Name = "${var.environment}-private-${count.index}" }
 }
 
-# NAT Gateway for private instances to access internet (e.g. download packages)
+# Elastic IP for NAT Gateway
 resource "aws_eip" "nat" {
   domain = "vpc"
+  tags   = { Name = "${var.environment}-nat-eip" }
 }
 
+# NAT Gateway (placed in public subnet so private subnet instances can access ECR/internet)
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat.id
   subnet_id     = aws_subnet.public[0].id
-  tags = { Name = "${var.environment}-nat" }
+  tags          = { Name = "${var.environment}-nat" }
 }
 
-# Routing
+# Route Tables
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.igw.id
   }
+  tags = { Name = "${var.environment}-public-rt" }
 }
 
 resource "aws_route_table" "private" {
@@ -58,8 +66,10 @@ resource "aws_route_table" "private" {
     cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.nat.id
   }
+  tags = { Name = "${var.environment}-private-rt" }
 }
 
+# Associations
 resource "aws_route_table_association" "public" {
   count          = 2
   subnet_id      = aws_subnet.public[count.index].id
@@ -72,10 +82,15 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private.id
 }
 
-data "aws_availability_zones" "available" {
-  state = "available"
+# Outputs
+output "vpc_id" {
+  value = aws_vpc.main.id
 }
 
-output "vpc_id" { value = aws_vpc.main.id }
-output "public_subnet_ids" { value = aws_subnet.public[*].id }
-output "private_subnet_ids" { value = aws_subnet.private[*].id }
+output "public_subnet_ids" {
+  value = aws_subnet.public[*].id
+}
+
+output "private_subnet_ids" {
+  value = aws_subnet.private[*].id
+}

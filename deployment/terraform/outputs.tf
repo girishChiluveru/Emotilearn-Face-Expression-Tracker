@@ -1,19 +1,14 @@
-output "alb_dns_name" {
-  description = "The DNS name of the ALB"
-  value       = module.ec2.alb_dns_name
-}
-
 output "bastion_public_ip" {
-  description = "Public IP of the bastion host"
+  description = "Public IP of the public EC2 instance (which acts as frontend server and bastion)"
   value       = module.ec2.bastion_public_ip
 }
 
-output "s3_tf_state_bucket" {
-  description = "Name of the S3 bucket for Terraform state"
-  value       = module.s3.bucket_id
+output "public_ec2_public_ip" {
+  description = "Public IP of the frontend Nginx EC2 instance"
+  value       = module.ec2.public_ec2_public_ip
 }
 
-output "sns_topic_arn" {
-  description = "ARN of the SNS topic for alerts"
-  value       = module.lambda_sns.sns_topic_arn
+output "private_ec2_private_ip" {
+  description = "Private IP of the backend and ML EC2 instance"
+  value       = module.ec2.private_ec2_private_ip
 }
