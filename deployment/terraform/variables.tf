@@ -16,10 +16,16 @@ variable "vpc_cidr" {
   default     = "10.0.0.0/16"
 }
 
-variable "instance_type" {
-  description = "EC2 instance type for applications"
+variable "public_instance_type" {
+  description = "EC2 instance type for public frontend"
   type        = string
-  default     = "t3.medium"
+  default     = "t3.micro"
+}
+
+variable "private_instance_type" {
+  description = "EC2 instance type for private backend"
+  type        = string
+  default     = "t3.small"
 }
 
 variable "key_name" {

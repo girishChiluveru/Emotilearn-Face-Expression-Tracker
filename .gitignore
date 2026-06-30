@@ -16,3 +16,4 @@ docker-compose.yml
 # Local deployment docs
 deployment_guide.md
 walkthrough.md
+ips.txt

@@ -2,7 +2,8 @@ variable "environment" {}
 variable "vpc_id" {}
 variable "public_subnet_ids" { type = list(string) }
 variable "private_subnet_ids" { type = list(string) }
-variable "instance_type" {}
+variable "public_instance_type" {}
+variable "private_instance_type" {}
 variable "key_name" {}
 
 # Fetch latest Ubuntu 22.04 LTS AMI
@@ -96,7 +97,7 @@ resource "aws_security_group" "private_sg" {
 # 3. Public EC2 Instance (Frontend + SSL Termination)
 resource "aws_instance" "public_frontend" {
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = var.instance_type
+  instance_type          = var.public_instance_type
   subnet_id              = var.public_subnet_ids[0]
   vpc_security_group_ids = [aws_security_group.public_sg.id]
   key_name               = var.key_name
@@ -113,7 +114,7 @@ resource "aws_instance" "public_frontend" {
 # 4. Private EC2 Instance (Backend API + ML Service + MongoDB)
 resource "aws_instance" "private_backend" {
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = var.instance_type
+  instance_type          = var.private_instance_type
   subnet_id              = var.private_subnet_ids[0]
   vpc_security_group_ids = [aws_security_group.private_sg.id]
   key_name               = var.key_name

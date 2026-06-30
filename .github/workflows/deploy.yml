@@ -146,13 +146,13 @@ jobs:
             fi
             
             # AWS CLI login helper to fetch latest docker images from ECR
-            aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-south-1.amazonaws.com
+            aws ecr get-login-password --region ap-south-1 | sudo docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-south-1.amazonaws.com
             
             # Pull and update containers
-            docker compose pull
-            docker compose down
-            docker compose up -d
+            sudo docker compose pull
+            sudo docker compose down
+            sudo docker compose up -d
             
             # Clean up dangling images to save disk space
-            docker image prune -f
+            sudo docker image prune -f
           EOF
