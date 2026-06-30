@@ -130,41 +130,29 @@ jobs:
               driver: bridge
           EOF
 
-      # ── Deploy Containers to Private EC2 via Public EC2 Bastion Jump ───────────
+      # ── Deploy Containers to Private EC2 via SSH ProxyCommand ────────────────────
       - name: Deploy Containers to Private EC2
         run: |
-          # Copy deployment key to Public EC2 temporarily to jump to private instance
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > temp_key.pem
-          chmod 600 temp_key.pem
-          scp temp_key.pem ${{ env.SSH_USER }}@${{ env.PUBLIC_EC2_HOST }}:/home/ubuntu/temp_key.pem
+          # Copy docker-compose.yml directly to Private EC2 via Public EC2 Bastion
+          scp -o StrictHostKeyChecking=no -o ProxyCommand="ssh -o StrictHostKeyChecking=no -W %h:%p ${{ env.SSH_USER }}@${{ env.PUBLIC_EC2_HOST }}" docker-compose.yml ${{ env.SSH_USER }}@${{ env.PRIVATE_EC2_HOST }}:/home/ubuntu/docker-compose.yml
 
-          # Copy docker-compose.yml to Public EC2, then from Public EC2 to Private EC2
-          scp docker-compose.yml ${{ env.SSH_USER }}@${{ env.PUBLIC_EC2_HOST }}:/home/ubuntu/docker-compose.yml
-          ssh ${{ env.SSH_USER }}@${{ env.PUBLIC_EC2_HOST }} "scp -o StrictHostKeyChecking=no -i /home/ubuntu/temp_key.pem /home/ubuntu/docker-compose.yml ubuntu@${{ env.PRIVATE_EC2_HOST }}:/home/ubuntu/docker-compose.yml"
-
-          # SSH into Public EC2, and from there run ECR login and docker compose up on the Private EC2
-          ssh ${{ env.SSH_USER }}@${{ env.PUBLIC_EC2_HOST }} -i /home/ubuntu/temp_key.pem << 'EOF'
-            ssh -o StrictHostKeyChecking=no ubuntu@${{ env.PRIVATE_EC2_HOST }} << 'INNER_EOF'
-              # Install Docker if not present (done via user data script initially, but safe checking)
-              if ! command -v docker &> /dev/null; then
-                sudo apt-get update
-                sudo apt-get install -y docker.io docker-compose-v2
-                sudo usermod -aG docker ubuntu
-              fi
-              
-              # AWS CLI login helper to fetch latest docker images from ECR
-              aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-south-1.amazonaws.com
-              
-              # Pull and update containers
-              docker compose pull
-              docker compose down
-              docker compose up -d
-              
-              # Clean up dangling images to save disk space
-              docker image prune -f
-            INNER_EOF
+          # Run deployment commands directly on the Private EC2 via Public EC2 Bastion
+          ssh -o StrictHostKeyChecking=no -o ProxyCommand="ssh -o StrictHostKeyChecking=no -W %h:%p ${{ env.SSH_USER }}@${{ env.PUBLIC_EC2_HOST }}" ${{ env.SSH_USER }}@${{ env.PRIVATE_EC2_HOST }} << 'EOF'
+            # Install Docker if not present
+            if ! command -v docker &> /dev/null; then
+              sudo apt-get update
+              sudo apt-get install -y docker.io docker-compose-v2
+              sudo usermod -aG docker ubuntu
+            fi
+            
+            # AWS CLI login helper to fetch latest docker images from ECR
+            aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-south-1.amazonaws.com
+            
+            # Pull and update containers
+            docker compose pull
+            docker compose down
+            docker compose up -d
+            
+            # Clean up dangling images to save disk space
+            docker image prune -f
           EOF
-
-          # Cleanup deployment key from Public EC2
-          ssh ${{ env.SSH_USER }}@${{ env.PUBLIC_EC2_HOST }} "rm -f /home/ubuntu/temp_key.pem"
-          rm -f temp_key.pem
