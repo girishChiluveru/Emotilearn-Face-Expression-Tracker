@@ -21,7 +21,7 @@ const reportRoutes = require('./routes/report1');
 const storeScoresRoutes = require('./routes/storeScores');
 
 // ── Models ────────────────────────────────────────────────────────────────────
-const Admin = require('./models/admin');
+const Admin = require('./models/Admin');
 const Report = require('./models/report');
 
 // ── Security Middleware ───────────────────────────────────────────────────────
